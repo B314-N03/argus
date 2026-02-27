@@ -1,0 +1,34 @@
+// IndicatorTrend component styles
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 40px;
+  margin-top: $spacing-3;
+}
+
+.bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  transition: height $transition-base;
+}
+
+.barBaseline {
+  background-color: $color-muted;
+  opacity: 0.4;
+}
+
+.barValue {
+  background-color: $color-chart-1;
+}
+
+.barAboveBaseline {
+  background-color: $color-chart-2;
+}
+
+.barBelowBaseline {
+  background-color: $color-destructive;
+}

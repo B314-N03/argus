@@ -1,0 +1,210 @@
+// Global styles for Argus OSINT Dashboard
+@use "sass:color";
+@use "variables" as *;
+@use "mixins" as *;
+@use "breakpoints" as *;
+@use "theme";
+
+// CSS Reset
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: $font-size-base;
+  line-height: 1.5;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  min-height: 100vh;
+}
+
+// Typography
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: $font-weight-semibold;
+  line-height: 1.25;
+  color: var(--color-foreground);
+}
+
+h1 {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-bold;
+}
+
+h2 {
+  font-size: $font-size-3xl;
+}
+
+h3 {
+  font-size: $font-size-2xl;
+}
+
+h4 {
+  font-size: $font-size-xl;
+}
+
+h5 {
+  font-size: $font-size-lg;
+}
+
+h6 {
+  font-size: $font-size-base;
+}
+
+p {
+  margin-bottom: $spacing-4;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: color.adjust($color-primary, $lightness: 10%);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+// Code
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: $spacing-1 $spacing-2;
+  background-color: var(--color-muted);
+  border-radius: $radius-sm;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: $font-size-sm;
+  padding: $spacing-4;
+  background-color: var(--color-muted);
+  border-radius: $radius-lg;
+  overflow-x: auto;
+  @include custom-scrollbar;
+}
+
+// Lists
+ul,
+ol {
+  padding-left: $spacing-6;
+  margin-bottom: $spacing-4;
+}
+
+li {
+  margin-bottom: $spacing-2;
+}
+
+// Images
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+// Buttons - Reset
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// Form elements - Reset
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background-color: var(--color-input);
+  border: 1px solid var(--color-border);
+  border-radius: $radius-md;
+  padding: $spacing-2 $spacing-3;
+  transition:
+    border-color $transition-fast,
+    box-shadow $transition-fast;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-ring);
+    box-shadow: 0 0 0 2px rgba($color-ring, 0.2);
+  }
+
+  &::placeholder {
+    color: var(--color-muted-foreground);
+  }
+}
+
+// Tables
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: $spacing-3 $spacing-4;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+th {
+  font-weight: $font-weight-semibold;
+  background-color: var(--color-muted);
+}
+
+// Selection
+::selection {
+  background-color: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+// Focus visible
+:focus-visible {
+  @include focus-ring;
+}
+
+// Scrollbar
+body {
+  @include custom-scrollbar;
+}
+
+// Utility classes (minimal set)
+.sr-only {
+  @include visually-hidden;
+}

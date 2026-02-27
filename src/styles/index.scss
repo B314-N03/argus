@@ -1,0 +1,7 @@
+// Main SCSS entry point for Argus OSINT Dashboard
+@use 'globals';
+
+// Export variables for use in components
+@forward 'variables';
+@forward 'breakpoints';
+@forward 'mixins';

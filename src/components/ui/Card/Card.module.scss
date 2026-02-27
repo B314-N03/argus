@@ -1,0 +1,29 @@
+// Card component styles
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.card {
+  @include card-base;
+  padding: $spacing-4;
+  transition: border-color $transition-base, box-shadow $transition-base;
+}
+
+.interactive {
+  cursor: pointer;
+
+  &:hover {
+    @include card-hover;
+  }
+}
+
+.paddingNone {
+  padding: 0;
+}
+
+.paddingSm {
+  padding: $spacing-3;
+}
+
+.paddingLg {
+  padding: $spacing-6;
+}

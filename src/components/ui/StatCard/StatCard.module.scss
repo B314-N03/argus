@@ -1,0 +1,60 @@
+// StatCard component styles
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.statCard {
+  @include card-base;
+  padding: $spacing-4;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-3;
+}
+
+.label {
+  font-size: $font-size-sm;
+  color: $color-muted-foreground;
+  font-weight: $font-weight-medium;
+}
+
+.icon {
+  color: $color-muted-foreground;
+  opacity: 0.7;
+}
+
+.value {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+  line-height: 1;
+  margin-bottom: $spacing-2;
+}
+
+.trend {
+  display: flex;
+  align-items: center;
+  gap: $spacing-1;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.trendUp {
+  color: $color-chart-2;
+}
+
+.trendDown {
+  color: $color-destructive;
+}
+
+.trendNeutral {
+  color: $color-muted-foreground;
+}
+
+.description {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  margin-top: $spacing-2;
+}

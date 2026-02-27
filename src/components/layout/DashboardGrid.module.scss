@@ -1,0 +1,74 @@
+// DashboardGrid component styles
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+@use '@/styles/breakpoints' as *;
+
+.grid {
+  display: grid;
+  gap: $spacing-4;
+  grid-template-columns: 1fr;
+
+  @include sm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include lg {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include xl {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.grid2 {
+  display: grid;
+  gap: $spacing-4;
+  grid-template-columns: 1fr;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include lg {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.grid3 {
+  display: grid;
+  gap: $spacing-4;
+  grid-template-columns: 1fr;
+
+  @include lg {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.span2 {
+  grid-column: span 1;
+
+  @include md {
+    grid-column: span 2;
+  }
+}
+
+.span3 {
+  grid-column: span 1;
+
+  @include lg {
+    grid-column: span 2;
+  }
+
+  @include xl {
+    grid-column: span 3;
+  }
+}
