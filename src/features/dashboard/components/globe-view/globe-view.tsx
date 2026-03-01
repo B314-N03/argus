@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, Suspense, lazy, useCallback, useMemo } from 'react'
+import { Sprite, SpriteMaterial, CanvasTexture } from 'three'
 import type { Zone, ZoneType, AircraftCategory, ShipType, SignalType } from '@/domain/models'
 import {
   getAircraftCategoryLabel,
@@ -22,11 +23,10 @@ export interface GlobePoint {
   lat: number
   lng: number
   label: string | null
-  type: 'aircraft' | 'vessel' | 'signal' | 'zone'
+  type: 'aircraft' | 'vessel' | 'signal'
   category?: AircraftCategory
   shipType?: ShipType
   signalType?: SignalType
-  zone?: Zone
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -41,6 +41,14 @@ interface ZonePolygon {
 
 function isZonePolygon(d: object): d is ZonePolygon {
   return '_kind' in d && (d as ZonePolygon)._kind === 'zone'
+}
+
+interface ZoneBadgeData {
+  lat: number
+  lng: number
+  text: string
+  color: string
+  zone: Zone
 }
 
 interface GlobeViewProps {
@@ -93,18 +101,55 @@ const ZONE_TYPE_ABBR: Record<ZoneType, string> = {
   duty_zone: 'P',
 }
 
-function getZoneRingConfig(zone: Zone) {
-  switch (zone.type) {
-    case 'exclusion':
-      return { propagationSpeed: 4, repeatPeriod: 400, color: '#f4212e' }
-    case 'blockade':
-      return { propagationSpeed: 2.5, repeatPeriod: 600, color: '#f4900c' }
-    case 'duty_zone':
-      return { propagationSpeed: 1, repeatPeriod: 1000, color: '#1d9bf0' }
-    case 'notam':
-    default:
-      return { propagationSpeed: 2, repeatPeriod: 800, color: '#00d4ff' }
+const ZONE_FILL_OPACITY = '1a' // ~10% fill
+const ZONE_STROKE_OPACITY = '88' // ~53% stroke
+
+const GLOBE_RADIUS = 100
+const BADGE_ALTITUDE = 0.012
+
+function polar2Cartesian(lat: number, lng: number, alt: number) {
+  const phi = ((90 - lat) * Math.PI) / 180
+  const theta = ((90 - lng) * Math.PI) / 180
+  const r = GLOBE_RADIUS * (1 + alt)
+  return {
+    x: r * Math.sin(phi) * Math.cos(theta),
+    y: r * Math.cos(phi),
+    z: r * Math.sin(phi) * Math.sin(theta),
   }
+}
+
+function createZoneBadgeSprite(text: string, color: string): Sprite {
+  const size = 128
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')!
+
+  // Circle background
+  ctx.beginPath()
+  ctx.arc(size / 2, size / 2, size / 2 - 4, 0, Math.PI * 2)
+  ctx.fillStyle = `${color}33`
+  ctx.fill()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 4
+  ctx.stroke()
+
+  // Centered text
+  ctx.fillStyle = color
+  ctx.font = 'bold 52px sans-serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(text, size / 2, size / 2)
+
+  const texture = new CanvasTexture(canvas)
+  const material = new SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+  })
+  const sprite = new Sprite(material)
+  sprite.scale.set(5, 5, 1)
+  return sprite
 }
 
 function buildEntityTooltipHtml(point: GlobePoint): string {
@@ -156,17 +201,6 @@ function buildZoneTooltipHtml(zone: Zone): string {
   </div>`
 }
 
-interface ZoneRingData {
-  lat: number
-  lng: number
-  maxR: number
-  propagationSpeed: number
-  repeatPeriod: number
-  color: string
-  altitude: number
-  zone: Zone
-}
-
 function GlobeRenderer({
   aircraftPoints,
   vesselPoints,
@@ -179,7 +213,6 @@ function GlobeRenderer({
   const globeRef = useRef<any>(undefined)
   const containerRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
-  const zoneTooltipRef = useRef<HTMLDivElement>(null)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
   const [hoverCountry, setHoverCountry] = useState<GeoJSONFeature | null>(null)
   const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null)
@@ -204,29 +237,27 @@ function GlobeRenderer({
     return () => observer.disconnect()
   }, [])
 
-  const zonePoints: GlobePoint[] = useMemo(
-    () =>
-      zones
-        .filter((z) => z.active)
-        .map((z) => ({
-          id: z.id,
-          lat: z.center[0],
-          lng: z.center[1],
-          label: z.name,
-          type: 'zone' as const,
-          zone: z,
-        })),
-    [zones],
-  )
-
-  const allPoints = useMemo(
+  const entityPoints = useMemo(
     () => [
       ...(filters.aircraft ? aircraftPoints : []),
       ...(filters.vessel ? vesselPoints : []),
       ...(filters.signal ? signalPoints : []),
-      ...zonePoints,
     ],
-    [aircraftPoints, vesselPoints, signalPoints, zonePoints, filters],
+    [aircraftPoints, vesselPoints, signalPoints, filters],
+  )
+
+  const zoneBadgeData: ZoneBadgeData[] = useMemo(
+    () =>
+      zones
+        .filter((z) => z.active)
+        .map((z) => ({
+          lat: z.center[0],
+          lng: z.center[1],
+          text: ZONE_TYPE_ABBR[z.type],
+          color: ZONE_TYPE_COLOR[z.type],
+          zone: z,
+        })),
+    [zones],
   )
 
   const zonePolygons: ZonePolygon[] = useMemo(
@@ -247,26 +278,6 @@ function GlobeRenderer({
     [countries, zonePolygons],
   )
 
-  const zoneRings: ZoneRingData[] = useMemo(
-    () =>
-      zones
-        .filter((z) => z.active)
-        .map((z) => {
-          const config = getZoneRingConfig(z)
-          return {
-            lat: z.center[0],
-            lng: z.center[1],
-            maxR: (z.radius ?? 100) / 80,
-            propagationSpeed: config.propagationSpeed,
-            repeatPeriod: config.repeatPeriod,
-            color: config.color,
-            altitude: 0.001,
-            zone: z,
-          }
-        }),
-    [zones],
-  )
-
   const showEntityTooltip = useCallback((el: HTMLElement, point: GlobePoint) => {
     const tooltip = tooltipRef.current
     if (!tooltip || !containerRef.current) return
@@ -285,77 +296,40 @@ function GlobeRenderer({
     }
   }, [])
 
-  const showZoneTooltip = useCallback((el: HTMLElement, zone: Zone) => {
-    const tooltip = zoneTooltipRef.current
-    if (!tooltip || !containerRef.current) return
-    const containerRect = containerRef.current.getBoundingClientRect()
-    const elRect = el.getBoundingClientRect()
-    tooltip.innerHTML = buildZoneTooltipHtml(zone)
-    tooltip.style.display = 'block'
-    tooltip.style.left = `${elRect.left - containerRect.left + elRect.width / 2}px`
-    tooltip.style.top = `${elRect.top - containerRect.top - 8}px`
-  }, [])
-
-  const hideZoneTooltip = useCallback(() => {
-    const tooltip = zoneTooltipRef.current
-    if (tooltip) {
-      tooltip.style.display = 'none'
-    }
-  }, [])
-
   const htmlElement = useCallback(
     (d: object) => {
       const point = d as GlobePoint
-
-      if (point.type === 'zone' && point.zone) {
-        const zone = point.zone
-        const color = ZONE_TYPE_COLOR[zone.type]
-        const abbr = ZONE_TYPE_ABBR[zone.type]
-
-        const el = document.createElement('div')
-        el.className = styles.zoneBadge
-        el.style.color = color
-        el.style.backgroundColor = `${color}22`
-        el.textContent = abbr
-
-        el.addEventListener('mouseenter', () => {
-          setHoveredZoneId(zone.id)
-          showZoneTooltip(el, zone)
-        })
-        el.addEventListener('mouseleave', () => {
-          setHoveredZoneId(null)
-          hideZoneTooltip()
-        })
-
-        return el
-      }
-
-      const entityPoint = point as GlobePoint & { type: 'aircraft' | 'vessel' | 'signal' }
       const el = document.createElement('div')
-      el.innerHTML = getEntityIconSvg(entityPoint)
+      el.innerHTML = getEntityIconSvg(point)
       el.style.cursor = 'pointer'
       el.style.pointerEvents = 'auto'
       el.addEventListener('mouseenter', () => showEntityTooltip(el, point))
       el.addEventListener('mouseleave', hideEntityTooltip)
       return el
     },
-    [showEntityTooltip, hideEntityTooltip, showZoneTooltip, hideZoneTooltip],
+    [showEntityTooltip, hideEntityTooltip],
   )
 
-  const ringColor = useCallback((d: object) => {
-    const ring = d as { color: string }
-    return (t: number) =>
-      `${ring.color}${Math.round((1 - t) * 255)
-        .toString(16)
-        .padStart(2, '0')}`
+  // Zone badges as WebGL sprites via custom layer
+  const customThreeObject = useCallback((d: object) => {
+    const item = d as ZoneBadgeData
+    const sprite = createZoneBadgeSprite(item.text, item.color)
+    const pos = polar2Cartesian(item.lat, item.lng, BADGE_ALTITUDE)
+    sprite.position.set(pos.x, pos.y, pos.z)
+    return sprite
+  }, [])
+
+  const customLayerLabel = useCallback((d: object) => {
+    const item = d as ZoneBadgeData
+    return buildZoneTooltipHtml(item.zone)
   }, [])
 
   const polygonCapColor = useCallback(
     (d: object) => {
       if (isZonePolygon(d)) {
         return hoveredZoneId === d.zone.id
-          ? `${d.color}26`
-          : 'rgba(0, 0, 0, 0)'
+          ? `${d.color}33`
+          : `${d.color}${ZONE_FILL_OPACITY}`
       }
       return d === hoverCountry ? 'rgba(29, 155, 240, 0.15)' : 'rgba(0, 0, 0, 0)'
     },
@@ -369,7 +343,7 @@ function GlobeRenderer({
       if (isZonePolygon(d)) {
         return hoveredZoneId === d.zone.id
           ? `${d.color}cc`
-          : 'rgba(0, 0, 0, 0)'
+          : `${d.color}${ZONE_STROKE_OPACITY}`
       }
       return d === hoverCountry ? 'rgba(255, 215, 0, 0.8)' : 'rgba(47, 51, 54, 0.3)'
     },
@@ -387,7 +361,7 @@ function GlobeRenderer({
   )
 
   const polygonLabel = useCallback((d: object) => {
-    if (isZonePolygon(d)) return ''
+    if (isZonePolygon(d)) return buildZoneTooltipHtml(d.zone)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const feat = d as any
     const name = feat?.properties?.name ?? ''
@@ -401,7 +375,11 @@ function GlobeRenderer({
   }, [])
 
   const handlePolygonHover = useCallback((d: object | null) => {
-    if (d && isZonePolygon(d)) return
+    if (d && isZonePolygon(d)) {
+      setHoveredZoneId(d.zone.id)
+      return
+    }
+    setHoveredZoneId(null)
     setHoverCountry(d)
   }, [])
 
@@ -421,7 +399,6 @@ function GlobeRenderer({
   return (
     <div ref={containerRef} className={styles.container}>
       <div ref={tooltipRef} className={styles.entityTooltip} />
-      <div ref={zoneTooltipRef} className={styles.zoneTooltip} />
       <GlobeEntityFilter filters={filters} onChange={setFilters} />
       {dimensions.width > 0 && (
         <GlobeGL
@@ -433,18 +410,14 @@ function GlobeRenderer({
           animateIn={false}
           atmosphereColor="#1d9bf0"
           atmosphereAltitude={0.15}
-          htmlElementsData={allPoints}
+          htmlElementsData={entityPoints}
           htmlLat="lat"
           htmlLng="lng"
           htmlAltitude={0.01}
           htmlElement={htmlElement}
-          ringsData={zoneRings}
-          ringLat="lat"
-          ringLng="lng"
-          ringMaxRadius="maxR"
-          ringPropagationSpeed="propagationSpeed"
-          ringRepeatPeriod="repeatPeriod"
-          ringColor={ringColor}
+          customLayerData={zoneBadgeData}
+          customThreeObject={customThreeObject}
+          customLayerLabel={customLayerLabel}
           polygonsData={allPolygons}
           polygonGeoJsonGeometry={polygonGeoJsonGeometry}
           polygonCapColor={polygonCapColor}

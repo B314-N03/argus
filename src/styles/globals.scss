@@ -208,3 +208,12 @@ body {
 .sr-only {
   @include visually-hidden;
 }
+
+// Globe tooltip wrapper reset — globe.gl wraps tooltip content in .float-tooltip-kap
+.float-tooltip-kap {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
