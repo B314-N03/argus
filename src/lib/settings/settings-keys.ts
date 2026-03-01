@@ -1,5 +1,6 @@
 export const SETTINGS_KEYS = {
   VISIBLE_WIDGETS: 'argus.widgets.visible',
+  GLOBE_ENTITY_FILTERS: 'argus.globe.entityFilters',
 } as const
 
 export interface WidgetVisibility {
@@ -20,4 +21,16 @@ export const DEFAULT_WIDGET_VISIBILITY: WidgetVisibility = {
   signals: true,
   chokepoints: true,
   forceSummary: true,
+}
+
+export interface GlobeEntityFilters {
+  aircraft: boolean
+  vessel: boolean
+  signal: boolean
+}
+
+export const DEFAULT_GLOBE_ENTITY_FILTERS: GlobeEntityFilters = {
+  aircraft: true,
+  vessel: true,
+  signal: true,
 }

@@ -1,0 +1,54 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.filterBar {
+  position: absolute;
+  bottom: $spacing-4;
+  left: $spacing-4;
+  z-index: $z-dropdown;
+  display: flex;
+  gap: $spacing-2;
+  @include glass-effect;
+  border-radius: $radius-xl;
+  padding: $spacing-1;
+}
+
+.filterButton {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid transparent;
+  border-radius: $radius-lg;
+  background: transparent;
+  cursor: pointer;
+  transition: all $transition-base;
+  padding: 0;
+  color: $color-muted-foreground;
+
+  &:hover {
+    background: rgba($color-muted, 0.5);
+  }
+
+  &.active {
+    background: rgba($color-muted, 0.3);
+  }
+
+  &.activeAircraft {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  &.activeVessel {
+    border-color: $color-chart-2;
+    color: $color-chart-2;
+  }
+
+  &.activeSignal {
+    border-color: $color-chart-3;
+    color: $color-chart-3;
+  }
+
+  &.inactive {
+    opacity: 0.35;
+  }
+}

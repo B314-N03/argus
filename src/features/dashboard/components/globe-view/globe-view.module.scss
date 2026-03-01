@@ -9,8 +9,44 @@
   overflow: hidden;
 
   :global(.scene-tooltip) {
-    z-index: 1070 !important;
+    z-index: $z-tooltip !important;
+    pointer-events: none;
   }
+}
+
+.entityTooltip {
+  display: none;
+  position: absolute;
+  z-index: $z-tooltip;
+  transform: translateX(-50%) translateY(-100%);
+  pointer-events: none;
+}
+
+.zoneBadge {
+  @include flex-center;
+  width: 22px;
+  height: 22px;
+  border-radius: $radius-full;
+  font-size: 9px;
+  font-weight: $font-weight-bold;
+  font-family: $font-family-mono;
+  letter-spacing: -0.5px;
+  border: 1.5px solid currentColor;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform $transition-fast;
+
+  &:hover {
+    transform: scale(1.3);
+  }
+}
+
+.zoneTooltip {
+  display: none;
+  position: absolute;
+  z-index: $z-tooltip;
+  transform: translateX(-50%) translateY(-100%);
+  pointer-events: none;
 }
 
 .loading {
