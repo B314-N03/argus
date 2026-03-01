@@ -35,29 +35,10 @@
 
   @include lg {
     order: 0;
-    width: 280px;
     max-height: none;
     border-top: none;
-    border-right: 1px solid $color-border;
+    border-right: none;
     flex-shrink: 0;
-  }
-
-  @include xl {
-    width: 320px;
-  }
-}
-
-.centerPanel {
-  order: 0;
-  flex: 1;
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
-  @include lg {
-    order: 1;
-    min-height: auto;
   }
 }
 
@@ -70,15 +51,117 @@
   @include custom-scrollbar;
 
   @include lg {
-    order: 2;
-    width: 280px;
+    order: 4;
     max-height: none;
     border-top: none;
-    border-left: 1px solid $color-border;
+    border-left: none;
     flex-shrink: 0;
   }
+}
 
-  @include xl {
-    width: 320px;
+.centerPanel {
+  order: 0;
+  flex: 1;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include lg {
+    order: 2;
+    min-height: auto;
+  }
+}
+
+// Drag handle between panels
+.dragHandle {
+  display: none;
+
+  @include lg {
+    display: block;
+    width: 6px;
+    flex-shrink: 0;
+    cursor: col-resize;
+    background-color: $color-border;
+    transition: background-color $transition-fast;
+    position: relative;
+
+    // Wider invisible hit area
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -4px;
+      right: -4px;
+    }
+
+    &:hover {
+      background-color: $color-primary;
+    }
+  }
+}
+
+// Collapse button positioned on the drag handle
+.collapseButton {
+  display: none;
+
+  @include lg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: $spacing-2;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: 24px;
+    height: 24px;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    background-color: rgba($color-card, 0.95);
+    color: $color-muted-foreground;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background-color: $color-muted;
+      color: $color-foreground;
+    }
+  }
+}
+
+// Thin expand strip when collapsed
+.expandStrip {
+  display: none;
+
+  @include lg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    flex-shrink: 0;
+    @include glass-effect;
+    border-left: 1px solid $color-border;
+    border-right: 1px solid $color-border;
+  }
+}
+
+.expandButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 48px;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  background-color: transparent;
+  color: $color-muted-foreground;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: $color-muted;
+    color: $color-foreground;
   }
 }
