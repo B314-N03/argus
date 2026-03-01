@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { GlobeLayout } from '@/components/layout/globe-layout/globe-layout'
 import {
@@ -16,6 +16,12 @@ import type { NewsItem, Country } from '@/domain/models'
 import { generateTensionHistory } from '@/lib/api/mock/indicators'
 import { mockNewsItems } from '@/lib/api/mock/news'
 import { findCountryByName } from '@/lib/api/mock/countries'
+import {
+  useSettings,
+  SETTINGS_KEYS,
+  DEFAULT_FEED_SPLIT_STATE,
+} from '@/lib/settings'
+import type { FeedSplitState } from '@/lib/settings'
 import styles from './index.module.scss'
 
 export const Route = createFileRoute('/')({
@@ -36,6 +42,72 @@ function DashboardPage() {
 
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
   const [selectedNewsItem, setSelectedNewsItem] = useState<NewsItem | null>(null)
+
+  const [feedSplit, setFeedSplit] = useSettings<FeedSplitState>(
+    SETTINGS_KEYS.FEED_SPLIT,
+    DEFAULT_FEED_SPLIT_STATE,
+  )
+  const feedSplitRef = useRef(feedSplit)
+  useEffect(() => {
+    feedSplitRef.current = feedSplit
+  }, [feedSplit])
+
+  const [dragRatio, setDragRatio] = useState<number | null>(null)
+  const dragRatioRef = useRef(dragRatio)
+  useEffect(() => {
+    dragRatioRef.current = dragRatio
+  }, [dragRatio])
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const startYRef = useRef(0)
+  const startRatioRef = useRef(0)
+
+  const handleDividerPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault()
+      startYRef.current = e.clientY
+      startRatioRef.current = feedSplitRef.current.topRatio
+
+      const handlePointerMove = (moveEvent: PointerEvent) => {
+        const container = containerRef.current
+        if (!container) return
+        const containerHeight = container.clientHeight
+        if (containerHeight === 0) return
+
+        const dy = moveEvent.clientY - startYRef.current
+        const deltaRatio = dy / containerHeight
+        const newRatio = Math.max(0.1, Math.min(0.9, startRatioRef.current + deltaRatio))
+
+        setDragRatio(newRatio)
+      }
+
+      const handlePointerUp = () => {
+        const finalRatio = dragRatioRef.current
+        if (finalRatio !== null) {
+          setFeedSplit({ ...feedSplitRef.current, topRatio: finalRatio })
+        }
+        setDragRatio(null)
+        document.removeEventListener('pointermove', handlePointerMove)
+        document.removeEventListener('pointerup', handlePointerUp)
+        document.body.style.cursor = ''
+        document.body.style.userSelect = ''
+      }
+
+      document.body.style.cursor = 'row-resize'
+      document.body.style.userSelect = 'none'
+      document.addEventListener('pointermove', handlePointerMove)
+      document.addEventListener('pointerup', handlePointerUp)
+    },
+    [setFeedSplit],
+  )
+
+  const toggleTopCollapse = useCallback(() => {
+    setFeedSplit({ ...feedSplitRef.current, topCollapsed: !feedSplitRef.current.topCollapsed })
+  }, [setFeedSplit])
+
+  const toggleBottomCollapse = useCallback(() => {
+    setFeedSplit({ ...feedSplitRef.current, bottomCollapsed: !feedSplitRef.current.bottomCollapsed })
+  }, [setFeedSplit])
 
   const tensionValue = useMemo(() => {
     if (!indicators?.summary) return 35
@@ -79,19 +151,46 @@ function DashboardPage() {
     setSelectedNewsItem(item)
   }, [])
 
+  const { topCollapsed, bottomCollapsed, topRatio } = feedSplit
+  const effectiveRatio = dragRatio ?? topRatio
+  const topFlex = topCollapsed ? 0 : effectiveRatio
+  const bottomFlex = bottomCollapsed ? 0 : 1 - effectiveRatio
+
   return (
     <>
       <GlobeLayout
         header={<DashboardHeader activeRegions={activeRegions} totalEntities={totalEntities} />}
         left={
-          <div className={styles.leftColumn}>
-            <ActivityFeed
-              aircraft={aircraftForFeed as never[]}
-              vessels={vessels}
-              signals={signals}
-            />
-            <div className={styles.feedDivider}>OSINT Sources</div>
-            <NewsFeed items={mockNewsItems} onItemClick={handleNewsItemClick} />
+          <div className={styles.leftColumn} ref={containerRef}>
+            <div
+              className={styles.feedSection}
+              style={{ flex: topCollapsed ? '0 0 auto' : topFlex }}
+            >
+              <NewsFeed
+                items={mockNewsItems}
+                onItemClick={handleNewsItemClick}
+                collapsed={topCollapsed}
+                onToggleCollapse={toggleTopCollapse}
+              />
+            </div>
+            <div
+              className={styles.feedDivider}
+              onPointerDown={handleDividerPointerDown}
+            >
+              Activity
+            </div>
+            <div
+              className={styles.feedSection}
+              style={{ flex: bottomCollapsed ? '0 0 auto' : bottomFlex }}
+            >
+              <ActivityFeed
+                aircraft={aircraftForFeed as never[]}
+                vessels={vessels}
+                signals={signals}
+                collapsed={bottomCollapsed}
+                onToggleCollapse={toggleBottomCollapse}
+              />
+            </div>
           </div>
         }
         center={

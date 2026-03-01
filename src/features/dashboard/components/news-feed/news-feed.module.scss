@@ -9,9 +9,32 @@
 }
 
 .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: $spacing-3 $spacing-4;
   border-bottom: 1px solid $color-border;
   border-left: 3px solid $color-chart-3;
+}
+
+.collapseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid $color-border;
+  border-radius: $radius-sm;
+  background-color: transparent;
+  color: $color-muted-foreground;
+  cursor: pointer;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: $color-muted;
+    color: $color-foreground;
+  }
 }
 
 .title {

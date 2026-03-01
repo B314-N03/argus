@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Radar, Waves, Radio, Activity } from 'lucide-react'
+import { Radar, Waves, Radio, Activity, ChevronUp, ChevronDown } from 'lucide-react'
 import type { Aircraft, Vessel, SignalEvent } from '@/domain/models'
 import styles from './activity-feed.module.scss'
 
@@ -14,9 +14,11 @@ interface ActivityFeedProps {
   aircraft: Aircraft[]
   vessels: Vessel[]
   signals: SignalEvent[]
+  collapsed?: boolean
+  onToggleCollapse?: () => void
 }
 
-export function ActivityFeed({ aircraft, vessels, signals }: ActivityFeedProps) {
+export function ActivityFeed({ aircraft, vessels, signals, collapsed, onToggleCollapse }: ActivityFeedProps) {
   const events = useMemo(() => {
     const feed: FeedEvent[] = []
 
@@ -61,21 +63,32 @@ export function ActivityFeed({ aircraft, vessels, signals }: ActivityFeedProps) 
     <div className={styles.feed}>
       <div className={styles.header}>
         <h3 className={styles.title}>Activity Feed</h3>
+        {onToggleCollapse && (
+          <button
+            className={styles.collapseButton}
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? 'Expand activity feed' : 'Collapse activity feed'}
+          >
+            {collapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+          </button>
+        )}
       </div>
-      <div className={styles.list}>
-        {events.map((event) => {
-          const Icon = IconMap[event.type]
-          return (
-            <div key={event.id} className={styles.event}>
-              <Icon size={14} className={styles[`icon_${event.type}`]} />
-              <div className={styles.content}>
-                <span className={styles.description}>{event.description}</span>
-                <span className={styles.time}>{formatTime(event.timestamp)}</span>
+      {!collapsed && (
+        <div className={styles.list}>
+          {events.map((event) => {
+            const Icon = IconMap[event.type]
+            return (
+              <div key={event.id} className={styles.event}>
+                <Icon size={14} className={styles[`icon_${event.type}`]} />
+                <div className={styles.content}>
+                  <span className={styles.description}>{event.description}</span>
+                  <span className={styles.time}>{formatTime(event.timestamp)}</span>
+                </div>
               </div>
-            </div>
-          )
-        })}
-      </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
