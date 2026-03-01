@@ -1,4 +1,5 @@
 // SCSS Mixins for Argus OSINT Dashboard
+@use 'sass:color';
 @use 'variables' as *;
 
 // Flexbox utilities
@@ -74,7 +75,7 @@
   color: $color-secondary-foreground;
 
   &:hover:not(:disabled) {
-    background-color: lighten($color-secondary, 5%);
+    background-color: color.adjust($color-secondary, $lightness: 5%);
   }
 }
 
