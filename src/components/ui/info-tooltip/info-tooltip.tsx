@@ -7,14 +7,20 @@ interface InfoTooltipProps {
 
 export function InfoTooltip({ content }: InfoTooltipProps) {
   const [visible, setVisible] = useState(false)
-  const [position, setPosition] = useState<'top' | 'bottom'>('top')
+  const [coords, setCoords] = useState<{ top: number; left: number; placement: 'top' | 'bottom' } | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (visible && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect()
-      // If too close to the top, show tooltip below
-      setPosition(rect.top < 120 ? 'bottom' : 'top')
+      const placement = rect.top < 120 ? 'bottom' : 'top'
+      setCoords({
+        left: rect.left + rect.width / 2,
+        top: placement === 'top' ? rect.top - 6 : rect.bottom + 6,
+        placement,
+      })
+    } else {
+      setCoords(null)
     }
   }, [visible])
 
@@ -32,8 +38,16 @@ export function InfoTooltip({ content }: InfoTooltipProps) {
       >
         i
       </button>
-      {visible && (
-        <span className={`${styles.tooltip} ${styles[position]}`} role="tooltip">
+      {visible && coords && (
+        <span
+          className={`${styles.tooltip} ${styles[coords.placement]}`}
+          role="tooltip"
+          style={{
+            position: 'fixed',
+            left: coords.left,
+            top: coords.top,
+          }}
+        >
           {content}
         </span>
       )}

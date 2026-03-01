@@ -34,8 +34,6 @@
 }
 
 .tooltip {
-  position: absolute;
-  left: 50%;
   transform: translateX(-50%);
   width: max-content;
   max-width: 260px;
@@ -55,9 +53,10 @@
 }
 
 .top {
-  bottom: calc(100% + 6px);
+  transform: translateX(-50%) translateY(-100%);
 }
 
 .bottom {
-  top: calc(100% + 6px);
+  // default: positioned below via top coordinate
+  transform: translateX(-50%);
 }

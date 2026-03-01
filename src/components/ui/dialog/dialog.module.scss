@@ -5,6 +5,8 @@
   @include card-base;
   @include custom-scrollbar;
   position: fixed;
+  inset: 0;
+  margin: auto;
   padding: 0;
   border: 1px solid $color-border;
   color: $color-foreground;
