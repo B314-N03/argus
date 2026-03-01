@@ -423,8 +423,33 @@ export const mockCountries: Country[] = [
   },
 ]
 
+const COUNTRY_NAME_ALIASES: Record<string, string> = {
+  'united states of america': 'united states',
+  'republic of korea': 'south korea',
+  "korea, democratic people's republic of": 'north korea',
+  "dem. rep. korea": 'north korea',
+  "rep. korea": 'south korea',
+  'iran (islamic republic of)': 'iran',
+  'russian federation': 'russia',
+  "people's republic of china": 'china',
+  'republic of china': 'taiwan',
+  'saudi arabia': 'saudi arabia',
+  'republic of türkiye': 'turkey',
+  'türkiye': 'turkey',
+  'czechia': 'czech republic',
+}
+
 export function findCountryByName(name: string): Country | undefined {
-  return mockCountries.find(
-    (c) => c.name.toLowerCase() === name.toLowerCase(),
-  )
+  const lower = name.toLowerCase()
+  const aliased = COUNTRY_NAME_ALIASES[lower] ?? lower
+
+  // Exact match first
+  const exact = mockCountries.find((c) => c.name.toLowerCase() === aliased)
+  if (exact) return exact
+
+  // Partial match fallback (either name contains the other)
+  return mockCountries.find((c) => {
+    const cLower = c.name.toLowerCase()
+    return cLower.includes(aliased) || aliased.includes(cLower)
+  })
 }
