@@ -1,0 +1,87 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+@use '@/styles/breakpoints' as *;
+
+.container {
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-6;
+  flex-wrap: wrap;
+  gap: $spacing-4;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.filter {
+  padding: $spacing-2 $spacing-3;
+  background-color: $color-input;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  color: $color-foreground;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+
+  &:hover {
+    border-color: $color-primary;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-ring;
+  }
+}
+
+.grid {
+  display: grid;
+  gap: $spacing-4;
+  grid-template-columns: 1fr;
+
+  @include lg {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-12;
+  color: $color-muted-foreground;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-12;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

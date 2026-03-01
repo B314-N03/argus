@@ -1,6 +1,6 @@
-// Indicators feature barrel exports
-export { default as IndicatorsGrid } from './components/IndicatorsGrid'
-export { default as IndicatorCard } from './components/IndicatorCard'
-export { default as IndicatorTrend } from './components/IndicatorTrend'
-export { useIndicators } from './hooks/useIndicators'
-export { getIndicators } from './api/getIndicators'
+export { IndicatorsGrid } from './components/indicators-grid/indicators-grid'
+export { IndicatorCard } from './components/indicator-card/indicator-card'
+export { IndicatorTypeCard } from './components/indicator-type-card/indicator-type-card'
+export { IndicatorTrend } from './components/indicator-trend/indicator-trend'
+export { useIndicators } from './hooks/use-indicators'
+export { getIndicators } from './api/get-indicators'

@@ -1,0 +1,52 @@
+@use '@/styles/variables' as *;
+@use '@/styles/breakpoints' as *;
+
+.container {
+  margin-bottom: $spacing-6;
+}
+
+.title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+  margin: 0 0 $spacing-4;
+}
+
+.grid {
+  display: grid;
+  gap: $spacing-4;
+  grid-template-columns: repeat(2, 1fr);
+
+  @include sm {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include lg {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}
+
+.statValue {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+}
+
+.military {
+  color: $color-destructive;
+}
+
+.tanker {
+  color: $color-chart-4;
+}

@@ -1,5 +1,5 @@
 import type { ReactNode, ButtonHTMLAttributes } from 'react'
-import styles from './Button.module.scss'
+import styles from './button.module.scss'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'destructive'
@@ -8,7 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode
 }
 
-export default function Button({
+export function Button({
   variant = 'primary',
   size = 'medium',
   fullWidth = false,

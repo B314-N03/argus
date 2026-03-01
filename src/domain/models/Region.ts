@@ -1,12 +1,8 @@
-// Geographic bounds
-export interface GeoBounds {
-  north: number
-  south: number
-  east: number
-  west: number
-}
+import type { GeoBounds } from '../types/geo'
+import { isWithinBounds } from '../types/geo'
 
-// Region types
+export { isWithinBounds }
+
 export type RegionType =
   | 'country'
   | 'region'
@@ -14,7 +10,6 @@ export type RegionType =
   | 'maritime'
   | 'airspace'
 
-// Region entity
 export interface Region {
   id: string
   name: string
@@ -28,21 +23,6 @@ export interface Region {
   }
 }
 
-// Helper function to check if coordinates are within bounds
-export function isWithinBounds(
-  latitude: number,
-  longitude: number,
-  bounds: GeoBounds
-): boolean {
-  return (
-    latitude >= bounds.south &&
-    latitude <= bounds.north &&
-    longitude >= bounds.west &&
-    longitude <= bounds.east
-  )
-}
-
-// Helper function to get region type label
 export function getRegionTypeLabel(type: RegionType): string {
   const labels: Record<RegionType, string> = {
     country: 'Country',
@@ -54,7 +34,6 @@ export function getRegionTypeLabel(type: RegionType): string {
   return labels[type]
 }
 
-// Helper function to format bounds
 export function formatBounds(bounds: GeoBounds): string {
   return `${bounds.north.toFixed(2)}°N, ${bounds.south.toFixed(2)}°S, ${bounds.east.toFixed(2)}°E, ${bounds.west.toFixed(2)}°W`
 }

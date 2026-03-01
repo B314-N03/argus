@@ -14,13 +14,9 @@
     "format": "prettier --check .",
     "check": "prettier --write . && eslint --fix",
     "start": "node .output/server/index.mjs",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@posthog/react": "^1.7.0",
-    "@sentry/tanstackstart-react": "^10.34.0",
-    "@storybook/react-vite": "^10.1.10",
     "@t3-oss/env-core": "^0.13.8",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-query": "^5.66.5",
@@ -30,14 +26,15 @@
     "@tanstack/react-router-ssr-query": "^1.131.7",
     "@tanstack/react-start": "^1.132.0",
     "@tanstack/router-plugin": "^1.132.0",
+    "@types/topojson-client": "^3.1.5",
     "clsx": "^2.1.1",
     "dotenv-cli": "^11.0.0",
     "lucide-react": "^0.561.0",
     "nitro": "npm:nitro-nightly@latest",
-    "posthog-js": "^1.335.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "storybook": "^10.1.10",
+    "react-globe.gl": "^2.37.0",
+    "topojson-client": "^3.1.0",
     "zod": "^4.1.11"
   },
   "devDependencies": {

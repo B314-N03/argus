@@ -9,94 +9,130 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignalsRouteImport } from './routes/signals'
+import { Route as RadiosRouteImport } from './routes/radios'
+import { Route as NavalRouteImport } from './routes/naval'
+import { Route as IndicatorsRouteImport } from './routes/indicators'
+import { Route as AirRouteImport } from './routes/air'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
-import { Route as DemoStorybookRouteImport } from './routes/demo/storybook'
-import { Route as DemoPosthogRouteImport } from './routes/demo/posthog'
-import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
 
+const SignalsRoute = SignalsRouteImport.update({
+  id: '/signals',
+  path: '/signals',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RadiosRoute = RadiosRouteImport.update({
+  id: '/radios',
+  path: '/radios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NavalRoute = NavalRouteImport.update({
+  id: '/naval',
+  path: '/naval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndicatorsRoute = IndicatorsRouteImport.update({
+  id: '/indicators',
+  path: '/indicators',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AirRoute = AirRouteImport.update({
+  id: '/air',
+  path: '/air',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
-  id: '/demo/tanstack-query',
-  path: '/demo/tanstack-query',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStorybookRoute = DemoStorybookRouteImport.update({
-  id: '/demo/storybook',
-  path: '/demo/storybook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoPosthogRoute = DemoPosthogRouteImport.update({
-  id: '/demo/posthog',
-  path: '/demo/posthog',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
-  id: '/demo/sentry/testing',
-  path: '/demo/sentry/testing',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/demo/posthog': typeof DemoPosthogRoute
-  '/demo/storybook': typeof DemoStorybookRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/air': typeof AirRoute
+  '/indicators': typeof IndicatorsRoute
+  '/naval': typeof NavalRoute
+  '/radios': typeof RadiosRoute
+  '/signals': typeof SignalsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/demo/posthog': typeof DemoPosthogRoute
-  '/demo/storybook': typeof DemoStorybookRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/air': typeof AirRoute
+  '/indicators': typeof IndicatorsRoute
+  '/naval': typeof NavalRoute
+  '/radios': typeof RadiosRoute
+  '/signals': typeof SignalsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/demo/posthog': typeof DemoPosthogRoute
-  '/demo/storybook': typeof DemoStorybookRoute
-  '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
+  '/air': typeof AirRoute
+  '/indicators': typeof IndicatorsRoute
+  '/naval': typeof NavalRoute
+  '/radios': typeof RadiosRoute
+  '/signals': typeof SignalsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/demo/posthog'
-    | '/demo/storybook'
-    | '/demo/tanstack-query'
-    | '/demo/sentry/testing'
+  fullPaths: '/' | '/air' | '/indicators' | '/naval' | '/radios' | '/signals'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/demo/posthog'
-    | '/demo/storybook'
-    | '/demo/tanstack-query'
-    | '/demo/sentry/testing'
+  to: '/' | '/air' | '/indicators' | '/naval' | '/radios' | '/signals'
   id:
     | '__root__'
     | '/'
-    | '/demo/posthog'
-    | '/demo/storybook'
-    | '/demo/tanstack-query'
-    | '/demo/sentry/testing'
+    | '/air'
+    | '/indicators'
+    | '/naval'
+    | '/radios'
+    | '/signals'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DemoPosthogRoute: typeof DemoPosthogRoute
-  DemoStorybookRoute: typeof DemoStorybookRoute
-  DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  DemoSentryTestingRoute: typeof DemoSentryTestingRoute
+  AirRoute: typeof AirRoute
+  IndicatorsRoute: typeof IndicatorsRoute
+  NavalRoute: typeof NavalRoute
+  RadiosRoute: typeof RadiosRoute
+  SignalsRoute: typeof SignalsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signals': {
+      id: '/signals'
+      path: '/signals'
+      fullPath: '/signals'
+      preLoaderRoute: typeof SignalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/radios': {
+      id: '/radios'
+      path: '/radios'
+      fullPath: '/radios'
+      preLoaderRoute: typeof RadiosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/naval': {
+      id: '/naval'
+      path: '/naval'
+      fullPath: '/naval'
+      preLoaderRoute: typeof NavalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/indicators': {
+      id: '/indicators'
+      path: '/indicators'
+      fullPath: '/indicators'
+      preLoaderRoute: typeof IndicatorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/air': {
+      id: '/air'
+      path: '/air'
+      fullPath: '/air'
+      preLoaderRoute: typeof AirRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,43 +140,16 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/tanstack-query': {
-      id: '/demo/tanstack-query'
-      path: '/demo/tanstack-query'
-      fullPath: '/demo/tanstack-query'
-      preLoaderRoute: typeof DemoTanstackQueryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/storybook': {
-      id: '/demo/storybook'
-      path: '/demo/storybook'
-      fullPath: '/demo/storybook'
-      preLoaderRoute: typeof DemoStorybookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/posthog': {
-      id: '/demo/posthog'
-      path: '/demo/posthog'
-      fullPath: '/demo/posthog'
-      preLoaderRoute: typeof DemoPosthogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/sentry/testing': {
-      id: '/demo/sentry/testing'
-      path: '/demo/sentry/testing'
-      fullPath: '/demo/sentry/testing'
-      preLoaderRoute: typeof DemoSentryTestingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DemoPosthogRoute: DemoPosthogRoute,
-  DemoStorybookRoute: DemoStorybookRoute,
-  DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  DemoSentryTestingRoute: DemoSentryTestingRoute,
+  AirRoute: AirRoute,
+  IndicatorsRoute: IndicatorsRoute,
+  NavalRoute: NavalRoute,
+  RadiosRoute: RadiosRoute,
+  SignalsRoute: SignalsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

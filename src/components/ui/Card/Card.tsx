@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import styles from './Card.module.scss'
+import styles from './card.module.scss'
 
 interface CardProps {
   children: ReactNode
@@ -9,7 +9,7 @@ interface CardProps {
   onClick?: () => void
 }
 
-export default function Card({
+export function Card({
   children,
   interactive = false,
   padding = 'md',

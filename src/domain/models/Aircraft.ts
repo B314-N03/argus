@@ -1,18 +1,5 @@
-// Geographic position
-export interface GeoPosition {
-  latitude: number
-  longitude: number
-  altitude?: number
-}
+import type { GeoPosition, Velocity } from '../types/geo'
 
-// Velocity information
-export interface Velocity {
-  heading: number
-  speed: number
-  verticalSpeed?: number
-}
-
-// Aircraft categories based on OSINT classification
 export type AircraftCategory =
   | 'commercial'
   | 'military'
@@ -21,7 +8,6 @@ export type AircraftCategory =
   | 'cargo'
   | 'unknown'
 
-// Aircraft entity
 export interface Aircraft {
   id: string
   callsign: string | null
@@ -36,7 +22,6 @@ export interface Aircraft {
   type?: string
 }
 
-// Helper function to get category label
 export function getAircraftCategoryLabel(category: AircraftCategory): string {
   const labels: Record<AircraftCategory, string> = {
     commercial: 'Commercial',

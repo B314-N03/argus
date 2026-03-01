@@ -1,0 +1,68 @@
+@use '@/styles/variables' as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-3;
+}
+
+.icon {
+  color: $color-chart-4;
+}
+
+.title {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+}
+
+.stats {
+  display: flex;
+  gap: $spacing-4;
+  margin-bottom: $spacing-3;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.statValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+}
+
+.active {
+  color: $color-chart-2;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}
+
+.recent {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding-top: $spacing-2;
+  border-top: 1px solid $color-border;
+  font-size: $font-size-xs;
+}
+
+.recentLabel {
+  color: $color-muted-foreground;
+}
+
+.recentName {
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.loading {
+  color: $color-muted-foreground;
+  font-size: $font-size-sm;
+  padding: $spacing-2;
+}

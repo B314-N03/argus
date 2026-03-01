@@ -1,0 +1,108 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.card {
+  @include card-base;
+  padding: $spacing-4;
+  transition: border-color $transition-base;
+
+  &:hover {
+    border-color: rgba($color-primary, 0.4);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-3;
+  margin-bottom: $spacing-3;
+}
+
+.designation {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+  margin: 0;
+}
+
+.name {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.nato {
+  color: $color-muted-foreground;
+  font-weight: $font-weight-normal;
+}
+
+.roleBadge {
+  flex-shrink: 0;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-chart-3;
+  background-color: rgba($color-chart-3, 0.12);
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-sm;
+  white-space: nowrap;
+}
+
+.description {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  line-height: 1.6;
+  margin: 0 0 $spacing-3;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.specs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-2;
+  margin-bottom: $spacing-3;
+  padding: $spacing-3;
+  background-color: rgba($color-muted, 0.5);
+  border-radius: $radius-md;
+}
+
+.spec {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.specLabel {
+  font-size: 10px;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.specValue {
+  font-size: $font-size-sm;
+  color: $color-foreground;
+  font-weight: $font-weight-medium;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-3;
+  border-top: 1px solid $color-border;
+}
+
+.operator {
+  font-size: $font-size-xs;
+  color: $color-chart-1;
+  font-weight: $font-weight-medium;
+}
+
+.country {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}

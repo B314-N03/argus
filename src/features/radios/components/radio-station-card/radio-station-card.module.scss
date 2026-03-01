@@ -1,0 +1,166 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.card {
+  @include card-base;
+  padding: $spacing-4;
+  transition: border-color $transition-base;
+
+  &:hover {
+    border-color: rgba($color-primary, 0.4);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-2;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.statusDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: $radius-full;
+}
+
+.statusActive {
+  background-color: $color-chart-2;
+  box-shadow: 0 0 6px rgba($color-chart-2, 0.5);
+}
+
+.statusInactive {
+  background-color: $color-muted-foreground;
+}
+
+.statusIntermittent {
+  background-color: $color-chart-3;
+  box-shadow: 0 0 6px rgba($color-chart-3, 0.5);
+}
+
+.statusUnknown {
+  background-color: $color-muted;
+}
+
+.name {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-card-foreground;
+  margin: 0;
+}
+
+.modeBadge {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-primary;
+  background-color: rgba($color-primary, 0.15);
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-sm;
+}
+
+.frequency {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+  margin-bottom: $spacing-2;
+}
+
+.waveformRow {
+  margin-bottom: $spacing-3;
+}
+
+.description {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  line-height: 1.5;
+  margin: 0 0 $spacing-3;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.activityBar {
+  margin-bottom: $spacing-3;
+}
+
+.activityLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  margin-bottom: $spacing-1;
+}
+
+.activityTrack {
+  height: 4px;
+  background-color: $color-muted;
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.activityFill {
+  height: 100%;
+  background-color: $color-primary;
+  border-radius: $radius-full;
+  transition: width $transition-slow;
+}
+
+.listenButton {
+  @include button-ghost;
+  width: 100%;
+  margin-bottom: $spacing-3;
+  font-size: $font-size-xs;
+  color: $color-primary;
+  border: 1px solid rgba($color-primary, 0.3);
+  gap: $spacing-2;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($color-primary, 0.1);
+    border-color: $color-primary;
+  }
+}
+
+.listenButtonActive {
+  background-color: rgba($color-primary, 0.15);
+  border-color: $color-primary;
+}
+
+.iframeContainer {
+  margin-bottom: $spacing-3;
+  border-radius: $radius-lg;
+  border: 1px solid $color-border;
+  overflow: hidden;
+}
+
+.iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  display: block;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: $spacing-3;
+  border-top: 1px solid $color-border;
+}
+
+.country {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}
+
+.lastSeen {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}

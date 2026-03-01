@@ -1,0 +1,68 @@
+@use '@/styles/variables' as *;
+@use '@/styles/breakpoints' as *;
+
+.container {
+  margin-top: $spacing-4;
+}
+
+.filters {
+  display: flex;
+  gap: $spacing-2;
+  margin-bottom: $spacing-4;
+  flex-wrap: wrap;
+}
+
+.filterButton {
+  padding: $spacing-2 $spacing-3;
+  border-radius: $radius-md;
+  border: 1px solid $color-border;
+  background: transparent;
+  color: $color-muted-foreground;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background-color: $color-muted;
+    color: $color-foreground;
+  }
+}
+
+.filterActive {
+  background-color: $color-primary;
+  color: $color-primary-foreground;
+  border-color: $color-primary;
+
+  &:hover {
+    background-color: $color-primary;
+    color: $color-primary-foreground;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-4;
+
+  @include md {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include xl {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.loading {
+  text-align: center;
+  color: $color-muted-foreground;
+  padding: $spacing-8;
+}
+
+.empty {
+  text-align: center;
+  color: $color-muted-foreground;
+  padding: $spacing-8;
+  font-size: $font-size-sm;
+}

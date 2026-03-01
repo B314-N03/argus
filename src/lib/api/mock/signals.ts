@@ -1,5 +1,6 @@
 // Mock signals data generator
 import type { SignalEvent, SignalType } from '@/domain/models'
+import { createSeededRandom } from './seed'
 
 const signalTypes: SignalType[] = [
   'adsb',
@@ -30,60 +31,51 @@ const modulations = [
   null,
 ]
 
-// Generate random position
-function generatePosition(): { latitude: number; longitude: number } | null {
-  if (Math.random() > 0.7) return null
-
-  return {
-    latitude: -60 + Math.random() * 120,
-    longitude: -180 + Math.random() * 360,
+function generateFrequency(random: () => number, signalType: SignalType): number {
+  switch (signalType) {
+    case 'adsb':
+      return 1090000000 + random() * 100000000
+    case 'ais':
+      return 161975000 + random() * 20000
+    case 'hf':
+      return 3000000 + random() * 27000000
+    case 'vhf':
+      return 30000000 + random() * 300000000
+    case 'satellite':
+      return 2000000000 + random() * 6000000000
+    case 'radar':
+      return 1000000000 + random() * 10000000000
+    default:
+      return 100000 + random() * 10000000
   }
 }
 
-// Generate mock signal event
-export function generateMockSignal(overrides?: Partial<SignalEvent>): SignalEvent {
-  const signalType = signalTypes[Math.floor(Math.random() * signalTypes.length)]
+function generateSeededSignal(index: number): SignalEvent {
+  const random = createSeededRandom(`signal_${index}`)
 
-  // Generate frequency based on signal type
-  let frequency: number
-  switch (signalType) {
-    case 'adsb':
-      frequency = 1090000000 + Math.random() * 100000000 // 1090 MHz
-      break
-    case 'ais':
-      frequency = 161975000 + Math.random() * 20000 // 162 MHz
-      break
-    case 'hf':
-      frequency = 3000000 + Math.random() * 27000000 // 3-30 MHz
-      break
-    case 'vhf':
-      frequency = 30000000 + Math.random() * 300000000 // 30-330 MHz
-      break
-    case 'satellite':
-      frequency = 2000000000 + Math.random() * 6000000000 // 2-8 GHz
-      break
-    case 'radar':
-      frequency = 1000000000 + Math.random() * 10000000000 // 1-11 GHz
-      break
-    default:
-      frequency = 100000 + Math.random() * 10000000
-  }
+  const signalType = signalTypes[Math.floor(random() * signalTypes.length)]
+  const hasLocation = random() > 0.3
+  const hasDuration = random() > 0.5
 
   return {
-    id: `sig_${Math.random().toString(36).substr(2, 9)}`,
-    timestamp: new Date(Date.now() - Math.random() * 86400000).toISOString(),
-    frequency: Math.round(frequency),
+    id: `sig_${index.toString(36).padStart(6, '0')}`,
+    timestamp: new Date(Date.now() - Math.floor(random() * 86400000)).toISOString(),
+    frequency: Math.round(generateFrequency(random, signalType)),
     signalType,
-    location: generatePosition(),
-    strength: Math.floor(Math.random() * 100),
-    modulation: modulations[Math.floor(Math.random() * modulations.length)],
-    source: sources[Math.floor(Math.random() * sources.length)],
-    duration: Math.random() > 0.5 ? Math.floor(Math.random() * 300) : undefined,
-    ...overrides,
+    location: hasLocation
+      ? {
+          latitude: -60 + random() * 120,
+          longitude: -180 + random() * 360,
+        }
+      : null,
+    strength: Math.floor(random() * 100),
+    modulation: modulations[Math.floor(random() * modulations.length)],
+    source: sources[Math.floor(random() * sources.length)],
+    duration: hasDuration ? Math.floor(random() * 300) : undefined,
   }
 }
 
 // Generate multiple mock signals
 export function generateMockSignalsList(count: number = 50): SignalEvent[] {
-  return Array.from({ length: count }, () => generateMockSignal())
+  return Array.from({ length: count }, (_, i) => generateSeededSignal(i))
 }

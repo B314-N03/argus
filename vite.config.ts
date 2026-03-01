@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -17,14 +16,13 @@ const config = defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        includePaths: [path.resolve(__dirname, 'src')],
+        loadPaths: [path.resolve(__dirname, 'src')],
         api: 'modern-compiler',
-      },
+      } as Record<string, unknown>,
     },
   },
   plugins: [
-    // devtools(), // Temporarily disabled
-    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+    nitro(),
     tsconfigPaths({ projects: ['./tsconfig.json'] }),
     tanstackStart(),
     viteReact(),

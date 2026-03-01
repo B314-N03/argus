@@ -1,0 +1,30 @@
+@use '@/styles/variables' as *;
+
+.tabs {
+  display: flex;
+  gap: $spacing-1;
+  margin-bottom: $spacing-6;
+  border-bottom: 1px solid $color-border;
+}
+
+.tab {
+  padding: $spacing-3 $spacing-4;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: $color-muted-foreground;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $color-foreground;
+  }
+}
+
+.tabActive {
+  color: $color-primary;
+  border-bottom-color: $color-primary;
+}

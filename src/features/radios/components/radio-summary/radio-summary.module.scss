@@ -1,0 +1,23 @@
+@use '@/styles/variables' as *;
+@use '@/styles/breakpoints' as *;
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-4;
+  margin-bottom: $spacing-6;
+
+  @include sm {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include lg {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.loading {
+  text-align: center;
+  color: $color-muted-foreground;
+  padding: $spacing-4;
+}

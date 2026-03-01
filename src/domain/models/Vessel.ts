@@ -1,11 +1,5 @@
-// Re-use the GeoPosition interface
-export interface GeoPosition {
-  latitude: number
-  longitude: number
-  altitude?: number
-}
+import type { GeoPosition } from '../types/geo'
 
-// Ship types based on OSINT classification
 export type ShipType =
   | 'cargo'
   | 'tanker'
@@ -16,7 +10,6 @@ export type ShipType =
   | 'research'
   | 'unknown'
 
-// Vessel entity
 export interface Vessel {
   id: string
   mmsi: string
@@ -33,7 +26,6 @@ export interface Vessel {
   eta?: string
 }
 
-// Helper function to get ship type label
 export function getShipTypeLabel(shipType: ShipType): string {
   const labels: Record<ShipType, string> = {
     cargo: 'Cargo Vessel',

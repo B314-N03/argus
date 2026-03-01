@@ -1,5 +1,5 @@
 // API response types
-import type { ActivityIndicator, Aircraft, Vessel, SignalEvent, Region } from '@/domain/models'
+import type { ActivityIndicator, Aircraft, Vessel, SignalEvent, Region, RadioStation, RadioSummary } from '@/domain/models'
 
 // Indicators API types
 export interface GetIndicatorsRequest {
@@ -14,6 +14,7 @@ export interface GetIndicatorsResponse {
     totalIndicators: number
     elevatedCount: number
     anomalousCount: number
+    averageDeviation: number
   }
 }
 
@@ -70,4 +71,10 @@ export interface GetSignalsResponse {
 // Regions API types
 export interface GetRegionsResponse {
   regions: Region[]
+}
+
+// Radios API types
+export interface GetRadiosResponse {
+  stations: RadioStation[]
+  summary: RadioSummary
 }

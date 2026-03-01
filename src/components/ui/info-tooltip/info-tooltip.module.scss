@@ -1,0 +1,63 @@
+@use '@/styles/variables' as *;
+
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: $radius-full;
+  border: 1px solid $color-muted-foreground;
+  background: transparent;
+  color: $color-muted-foreground;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  font-style: italic;
+  font-family: $font-family-sans;
+  cursor: help;
+  transition: all $transition-fast;
+  line-height: 1;
+  padding: 0;
+
+  &:hover,
+  &:focus {
+    border-color: $color-primary;
+    color: $color-primary;
+    outline: none;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 260px;
+  padding: $spacing-2 $spacing-3;
+  background-color: $color-popover;
+  color: $color-popover-foreground;
+  border: 1px solid $color-border;
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  font-style: normal;
+  font-weight: $font-weight-normal;
+  line-height: 1.5;
+  z-index: $z-tooltip;
+  box-shadow: $shadow-lg;
+  pointer-events: none;
+  white-space: normal;
+}
+
+.top {
+  bottom: calc(100% + 6px);
+}
+
+.bottom {
+  top: calc(100% + 6px);
+}

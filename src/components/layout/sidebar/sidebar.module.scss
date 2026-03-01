@@ -1,0 +1,140 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+@use '@/styles/breakpoints' as *;
+
+.sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: $sidebar-width;
+  height: calc(100vh - 64px);
+  background-color: $color-sidebar;
+  border-right: 1px solid $color-sidebar-border;
+  transform: translateX(-100%);
+  transition: transform $transition-slow;
+  z-index: $z-fixed;
+  display: flex;
+  flex-direction: column;
+  @include custom-scrollbar;
+
+  @include lg {
+    transform: translateX(0);
+  }
+}
+
+.open {
+  transform: translateX(0);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-6;
+  border-bottom: 1px solid $color-sidebar-border;
+}
+
+.title {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-sidebar-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-md;
+  color: $color-sidebar-foreground;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $color-sidebar-accent;
+  }
+
+  @include lg {
+    display: none;
+  }
+}
+
+.nav {
+  flex: 1;
+  padding: $spacing-4;
+  overflow-y: auto;
+}
+
+.navSection {
+  margin-bottom: $spacing-6;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.navSectionTitle {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: $spacing-2 $spacing-3;
+  margin-bottom: $spacing-2;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $radius-md;
+  color: $color-sidebar-foreground;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-fast;
+  margin-bottom: $spacing-1;
+
+  &:hover {
+    background-color: $color-sidebar-accent;
+    color: $color-sidebar-accent-foreground;
+  }
+}
+
+.active {
+  background-color: $color-sidebar-primary;
+  color: $color-sidebar-primary-foreground;
+
+  &:hover {
+    background-color: $color-sidebar-primary;
+    color: $color-sidebar-primary-foreground;
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  top: 64px;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: $z-fixed - 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity $transition-base, visibility $transition-base;
+
+  @include lg {
+    display: none;
+  }
+}
+
+.overlayVisible {
+  opacity: 1;
+  visibility: visible;
+}

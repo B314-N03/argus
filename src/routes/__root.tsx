@@ -3,18 +3,11 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
 
-import Header from '../components/Header'
+import { Header } from '@/components/layout/header/header'
+import { TanStackQueryProvider } from '@/integrations/tanstack-query/root-provider'
 
-import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
-import PostHogProvider from '../integrations/posthog/provider'
-
-import appCss from '../styles/index.scss?url'
+import appCss from '@/styles/index.scss?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 
@@ -54,22 +47,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <TanStackQueryProvider>
-          <PostHogProvider>
-            <Header />
-            {children}
-            <TanStackDevtools
-              config={{
-                position: 'bottom-right',
-              }}
-              plugins={[
-                {
-                  name: 'Tanstack Router',
-                  render: <TanStackRouterDevtoolsPanel />,
-                },
-                TanStackQueryDevtools,
-              ]}
-            />
-          </PostHogProvider>
+          <Header />
+          {children}
         </TanStackQueryProvider>
         <Scripts />
       </body>

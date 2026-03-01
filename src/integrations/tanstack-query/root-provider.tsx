@@ -21,7 +21,7 @@ export function getContext() {
   return context
 }
 
-export default function TanStackQueryProvider({
+export function TanStackQueryProvider({
   children,
 }: {
   children: ReactNode

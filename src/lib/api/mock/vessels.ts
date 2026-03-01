@@ -1,5 +1,6 @@
 // Mock vessels data generator
 import type { Vessel, ShipType } from '@/domain/models'
+import { createSeededRandom } from './seed'
 
 const countries = [
   'United States',
@@ -40,33 +41,29 @@ const shipTypes: ShipType[] = [
   'research',
 ]
 
-// Generate random maritime position
-function generatePosition(): { latitude: number; longitude: number } {
-  const latitude = -60 + Math.random() * 120
-  const longitude = -180 + Math.random() * 360
+function generateSeededVessel(index: number): Vessel {
+  const random = createSeededRandom(`vessel_${index}`)
 
-  return { latitude, longitude }
-}
-
-// Generate mock vessel
-export function generateMockVessel(overrides?: Partial<Vessel>): Vessel {
-  const shipType = shipTypes[Math.floor(Math.random() * shipTypes.length)]
+  const shipType = shipTypes[Math.floor(random() * shipTypes.length)]
+  const latitude = -60 + random() * 120
+  const longitude = -180 + random() * 360
+  const hasCourse = random() > 0.3
+  const hasSpeed = random() > 0.3
 
   return {
-    id: `vs_${Math.random().toString(36).substr(2, 9)}`,
-    mmsi: Math.floor(200000000 + Math.random() * 799999999).toString(),
-    name: vesselNames[Math.floor(Math.random() * vesselNames.length)],
-    flag: countries[Math.floor(Math.random() * countries.length)],
-    position: generatePosition(),
-    course: Math.random() > 0.3 ? Math.floor(Math.random() * 360) : null,
-    speed: Math.random() > 0.3 ? Math.floor(Math.random() * 25) : null,
+    id: `vs_${index.toString(36).padStart(6, '0')}`,
+    mmsi: Math.floor(200000000 + random() * 799999999).toString(),
+    name: vesselNames[Math.floor(random() * vesselNames.length)],
+    flag: countries[Math.floor(random() * countries.length)],
+    position: { latitude, longitude },
+    course: hasCourse ? Math.floor(random() * 360) : null,
+    speed: hasSpeed ? Math.floor(random() * 25) : null,
     shipType,
-    lastSeen: new Date(Date.now() - Math.random() * 3600000).toISOString(),
-    ...overrides,
+    lastSeen: new Date(Date.now() - Math.floor(random() * 3600000)).toISOString(),
   }
 }
 
 // Generate multiple mock vessels
 export function generateMockVesselsList(count: number = 30): Vessel[] {
-  return Array.from({ length: count }, () => generateMockVessel())
+  return Array.from({ length: count }, (_, i) => generateSeededVessel(i))
 }

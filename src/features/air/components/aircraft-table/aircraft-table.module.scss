@@ -1,0 +1,109 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+@use '@/styles/breakpoints' as *;
+
+.container {
+  width: 100%;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  @include custom-scrollbar;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-size-sm;
+
+  th {
+    text-align: left;
+    padding: $spacing-3 $spacing-4;
+    font-weight: $font-weight-semibold;
+    color: $color-muted-foreground;
+    border-bottom: 1px solid $color-border;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $spacing-3 $spacing-4;
+    color: $color-foreground;
+    border-bottom: 1px solid $color-border;
+  }
+
+  tbody tr {
+    transition: background-color $transition-fast;
+
+    &:hover {
+      background-color: $color-muted;
+    }
+  }
+}
+
+.callsign {
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.mono {
+  font-family: $font-family-mono;
+  font-size: $font-size-xs;
+}
+
+.time {
+  color: $color-muted-foreground;
+  font-size: $font-size-xs;
+}
+
+.badge {
+  display: inline-block;
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  background-color: $color-muted;
+  color: $color-foreground;
+}
+
+.badgemilitary {
+  background-color: rgba($color-destructive, 0.15);
+  color: $color-destructive;
+}
+
+.badgegovernment {
+  background-color: rgba($color-chart-3, 0.15);
+  color: $color-chart-3;
+}
+
+.badgecommercial {
+  background-color: rgba($color-chart-2, 0.15);
+  color: $color-chart-2;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-12;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $color-border;
+  border-top-color: $color-primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-12;
+  color: $color-muted-foreground;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

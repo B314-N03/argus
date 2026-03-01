@@ -1,0 +1,132 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.card {
+  @include card-base;
+  overflow: hidden;
+  transition: border-color $transition-base;
+
+  &:hover {
+    border-color: rgba($color-primary, 0.3);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: $spacing-4;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover {
+    background-color: rgba($color-muted, 0.2);
+  }
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.typeName {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-card-foreground;
+  margin: 0;
+}
+
+.stats {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-2;
+}
+
+.avgValue {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+  line-height: 1;
+}
+
+.avgDeviation {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.headerRight {
+  color: $color-muted-foreground;
+  flex-shrink: 0;
+}
+
+.sparkline {
+  padding: 0 $spacing-4 $spacing-3;
+}
+
+// Deviation color classes
+.deviationPositive {
+  color: $color-chart-2;
+}
+
+.deviationNegative {
+  color: $color-destructive;
+}
+
+.deviationNeutral {
+  color: $color-muted-foreground;
+}
+
+.deviationElevated {
+  color: $color-chart-3;
+}
+
+.deviationAnomalous {
+  color: $color-destructive;
+}
+
+// Region breakdown table
+.regionBreakdown {
+  border-top: 1px solid $color-border;
+  padding: $spacing-3 $spacing-4 $spacing-4;
+  overflow-x: auto;
+}
+
+.regionTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-size-xs;
+
+  th {
+    text-align: left;
+    padding: $spacing-2 $spacing-2;
+    color: $color-muted-foreground;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid $color-border;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: $spacing-2 $spacing-2;
+    color: $color-card-foreground;
+    border-bottom: 1px solid rgba($color-border, 0.4);
+    white-space: nowrap;
+  }
+}
+
+.rowElevated {
+  background-color: rgba($color-chart-3, 0.06);
+}
+
+.rowAnomalous {
+  background-color: rgba($color-destructive, 0.08);
+}

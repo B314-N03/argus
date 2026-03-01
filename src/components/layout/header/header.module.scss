@@ -1,0 +1,220 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+@use '@/styles/breakpoints' as *;
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0 $spacing-4;
+  background-color: $color-sidebar;
+  border-bottom: 1px solid $color-sidebar-border;
+  z-index: $z-sticky;
+
+  @include md {
+    padding: 0 $spacing-6;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.logoIcon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  background: linear-gradient(135deg, $color-chart-1, $color-chart-4);
+}
+
+.logoText {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-sidebar-foreground;
+  margin: 0;
+  letter-spacing: -0.02em;
+
+  @include max-sm {
+    display: none;
+  }
+}
+
+.logoSubtext {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  margin-left: $spacing-2;
+  display: none;
+
+  @include md {
+    display: inline;
+  }
+}
+
+// Desktop horizontal nav
+.nav {
+  display: none;
+  justify-content: center;
+  gap: $spacing-1;
+
+  @include md {
+    display: flex;
+  }
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-1;
+  padding: $spacing-1 $spacing-3;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $color-muted-foreground;
+  text-decoration: none;
+  border-radius: $radius-full;
+  transition: color $transition-fast, background-color $transition-fast;
+
+  &:hover {
+    color: $color-sidebar-foreground;
+    background-color: $color-sidebar-accent;
+  }
+}
+
+.navLinkActive {
+  color: $color-primary;
+  background-color: rgba($color-primary, 0.12);
+
+  &:hover {
+    color: $color-primary;
+    background-color: rgba($color-primary, 0.18);
+  }
+}
+
+// Hamburger button — visible only below md
+.menuButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-md;
+  color: $color-sidebar-foreground;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $color-sidebar-accent;
+  }
+
+  @include md {
+    display: none;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-md;
+  color: $color-sidebar-foreground;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $color-sidebar-accent;
+  }
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  padding: $spacing-1 $spacing-3;
+  border-radius: $radius-full;
+  background-color: rgba($color-chart-2, 0.15);
+  color: $color-chart-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+
+  @include max-sm {
+    display: none;
+  }
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $color-chart-2;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+// Mobile dropdown menu
+.mobileMenu {
+  position: fixed;
+  top: $header-height;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-2;
+  background-color: $color-sidebar;
+  border-bottom: 1px solid $color-sidebar-border;
+  z-index: $z-sticky;
+  box-shadow: $shadow-lg;
+}
+
+.mobileNavLink {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-3 $spacing-4;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-sidebar-foreground;
+  text-decoration: none;
+  border-radius: $radius-md;
+  transition: background-color $transition-fast;
+
+  &:hover {
+    background-color: $color-sidebar-accent;
+  }
+}
+
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  top: $header-height;
+  z-index: calc($z-sticky - 1);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

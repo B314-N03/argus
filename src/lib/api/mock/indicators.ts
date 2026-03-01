@@ -1,5 +1,6 @@
 // Mock indicators data generator
 import type { ActivityIndicator, IndicatorType, TimeWindow, TrendDirection } from '@/domain/models'
+import { createSeededRandom } from './seed'
 
 const indicatorTypes: IndicatorType[] = [
   'isr_activity',
@@ -20,10 +21,6 @@ const regions = [
   'caribbean',
 ]
 
-const timeWindows: TimeWindow[] = ['1h', '6h', '24h', '7d']
-
-const trends: TrendDirection[] = ['increasing', 'decreasing', 'stable']
-
 const indicatorNames: Record<IndicatorType, string> = {
   isr_activity: 'ISR Activity Index',
   naval_presence: 'Naval Presence Index',
@@ -33,41 +30,17 @@ const indicatorNames: Record<IndicatorType, string> = {
   anomaly_score: 'Anomaly Score',
 }
 
-// Generate random deviation (-30% to +50%)
-function generateDeviation(): number {
-  return Math.random() * 80 - 30
-}
-
-// Generate confidence (0.6 to 0.98)
-function generateConfidence(): number {
-  return 0.6 + Math.random() * 0.38
-}
-
-// Generate baseline value (40 to 80)
-function generateBaseline(): number {
-  return 40 + Math.random() * 40
-}
-
-// Generate value based on deviation from baseline
-function generateValue(baseline: number, deviation: number): number {
-  return baseline * (1 + deviation / 100)
-}
-
-// Generate trend based on deviation
-function generateTrend(deviation: number): TrendDirection {
-  if (deviation > 10) return 'increasing'
-  if (deviation < -10) return 'decreasing'
-  return 'stable'
-}
-
-// Generate history points
-function generateHistory(baseValue: number, deviation: number): { timestamp: string; value: number; baseline: number }[] {
+function generateHistory(
+  random: () => number,
+  baseValue: number,
+  deviation: number,
+): { timestamp: string; value: number; baseline: number }[] {
   const history = []
   const now = new Date()
 
   for (let i = 23; i >= 0; i--) {
     const timestamp = new Date(now.getTime() - i * 60 * 60 * 1000)
-    const variance = (Math.random() - 0.5) * 20
+    const variance = (random() - 0.5) * 20
     const value = baseValue * (1 + (deviation + variance) / 100)
 
     history.push({
@@ -80,49 +53,108 @@ function generateHistory(baseValue: number, deviation: number): { timestamp: str
   return history
 }
 
-// Generate a single mock indicator
-export function generateMockIndicator(overrides?: Partial<ActivityIndicator>): ActivityIndicator {
-  const type = indicatorTypes[Math.floor(Math.random() * indicatorTypes.length)]
-  const region = regions[Math.floor(Math.random() * regions.length)]
-  const timeWindow = timeWindows[Math.floor(Math.random() * timeWindows.length)]
-  const deviation = generateDeviation()
-  const baseline = generateBaseline()
-  const value = generateValue(baseline, deviation)
-  const confidence = generateConfidence()
-
-  return {
-    id: `ind_${type}_${region}_${timeWindow}`,
-    name: indicatorNames[type],
-    type,
-    value: Math.round(value * 10) / 10,
-    baseline: Math.round(baseline * 10) / 10,
-    deviation: Math.round(deviation * 10) / 10,
-    confidence: Math.round(confidence * 100) / 100,
-    timeWindow,
-    region,
-    updatedAt: new Date().toISOString(),
-    trend: generateTrend(deviation),
-    history: generateHistory(baseline, deviation),
-    ...overrides,
-  }
+function generateTrend(deviation: number): TrendDirection {
+  if (deviation > 10) return 'increasing'
+  if (deviation < -10) return 'decreasing'
+  return 'stable'
 }
 
-// Generate multiple mock indicators
-export function generateMockIndicators(count: number = 12): ActivityIndicator[] {
+// Pre-generate all 42 indicators (6 types × 7 regions) with seeded random
+function buildAllIndicators(timeWindow: TimeWindow): ActivityIndicator[] {
   const indicators: ActivityIndicator[] = []
 
-  // Ensure at least one of each type
   for (const type of indicatorTypes) {
-    indicators.push(generateMockIndicator({ type }))
-  }
+    for (const region of regions) {
+      const seed = `${type}_${region}_${timeWindow}`
+      const random = createSeededRandom(seed)
 
-  // Fill remaining with random indicators
-  const remaining = count - indicatorTypes.length
-  for (let i = 0; i < remaining; i++) {
-    indicators.push(generateMockIndicator())
+      const deviation = random() * 80 - 30
+      const baseline = 40 + random() * 40
+      const value = baseline * (1 + deviation / 100)
+      const confidence = 0.6 + random() * 0.38
+
+      indicators.push({
+        id: `ind_${type}_${region}_${timeWindow}`,
+        name: indicatorNames[type],
+        type,
+        value: Math.round(value * 10) / 10,
+        baseline: Math.round(baseline * 10) / 10,
+        deviation: Math.round(deviation * 10) / 10,
+        confidence: Math.round(confidence * 100) / 100,
+        timeWindow,
+        region,
+        updatedAt: new Date().toISOString(),
+        trend: generateTrend(deviation),
+        history: generateHistory(random, baseline, deviation),
+      })
+    }
   }
 
   return indicators
+}
+
+// Generate mock indicators with filtering
+export function generateMockIndicators(
+  count: number = 42,
+  params?: { region?: string; type?: string; timeWindow?: TimeWindow },
+): ActivityIndicator[] {
+  const timeWindow = params?.timeWindow ?? '24h'
+  let indicators = buildAllIndicators(timeWindow)
+
+  if (params?.region) {
+    indicators = indicators.filter((ind) => ind.region === params.region)
+  }
+
+  if (params?.type) {
+    indicators = indicators.filter((ind) => ind.type === params.type)
+  }
+
+  return indicators.slice(0, count)
+}
+
+// Derive 24-hour tension history from indicator history data
+export function generateTensionHistory(
+  indicators: ActivityIndicator[],
+): { timestamp: string; value: number }[] {
+  if (!indicators.length) return []
+
+  // Each indicator has 24 history points (hourly)
+  const historyLength = indicators[0].history?.length ?? 0
+  if (historyLength === 0) return []
+
+  const points: { timestamp: string; value: number }[] = []
+
+  for (let i = 0; i < historyLength; i++) {
+    let sumDeviation = 0
+    let elevatedCount = 0
+    let anomalousCount = 0
+    let count = 0
+
+    for (const ind of indicators) {
+      const point = ind.history?.[i]
+      if (!point) continue
+
+      const deviation = point.baseline > 0
+        ? ((point.value - point.baseline) / point.baseline) * 100
+        : 0
+
+      sumDeviation += Math.abs(deviation)
+      if (deviation > 15) elevatedCount++
+      if (deviation > 30) anomalousCount++
+      count++
+    }
+
+    const avgDeviation = count > 0 ? sumDeviation / count : 0
+    const deviationComponent = Math.min(avgDeviation * 1.5, 40)
+    const elevatedComponent = Math.min(elevatedCount * 3, 30)
+    const anomalousComponent = Math.min(anomalousCount * 5, 30)
+    const value = Math.round(deviationComponent + elevatedComponent + anomalousComponent)
+
+    const timestamp = indicators[0].history?.[i]?.timestamp ?? new Date().toISOString()
+    points.push({ timestamp, value: Math.min(value, 100) })
+  }
+
+  return points
 }
 
 // Calculate summary statistics
@@ -132,9 +164,10 @@ export function calculateIndicatorsSummary(indicators: ActivityIndicator[]): {
   anomalousCount: number
   averageDeviation: number
 } {
-  const elevatedCount = indicators.filter(i => i.deviation > 15).length
-  const anomalousCount = indicators.filter(i => i.deviation > 30).length
-  const averageDeviation = indicators.reduce((sum, i) => sum + i.deviation, 0) / indicators.length
+  const elevatedCount = indicators.filter((i) => i.deviation > 15).length
+  const anomalousCount = indicators.filter((i) => i.deviation > 30).length
+  const averageDeviation =
+    indicators.length > 0 ? indicators.reduce((sum, i) => sum + i.deviation, 0) / indicators.length : 0
 
   return {
     totalIndicators: indicators.length,

@@ -1,5 +1,6 @@
 // Mock aircraft data generator
 import type { Aircraft, AircraftCategory } from '@/domain/models'
+import { createSeededRandom } from './seed'
 
 const countries = [
   'United States',
@@ -47,46 +48,37 @@ const registrations = [
   null,
 ]
 
-// Generate random position within bounds
-function generatePosition(): { latitude: number; longitude: number; altitude: number } {
-  const latitude = -60 + Math.random() * 120
-  const longitude = -180 + Math.random() * 360
-  const altitude = Math.floor(Math.random() * 40000) + 10000
+// Generate a stable mock aircraft based on index
+function generateSeededAircraft(index: number): Aircraft {
+  const random = createSeededRandom(`aircraft_${index}`)
 
-  return { latitude, longitude, altitude }
-}
-
-// Generate random velocity
-function generateVelocity(): { heading: number; speed: number; verticalSpeed: number } | null {
-  if (Math.random() > 0.8) return null
+  const category = aircraftCategories[Math.floor(random() * aircraftCategories.length)]
+  const latitude = -60 + random() * 120
+  const longitude = -180 + random() * 360
+  const altitude = Math.floor(random() * 40000) + 10000
+  const hasVelocity = random() > 0.2
 
   return {
-    heading: Math.floor(Math.random() * 360),
-    speed: Math.floor(Math.random() * 500) + 200,
-    verticalSpeed: Math.floor(Math.random() * 2000) - 1000,
-  }
-}
-
-// Generate mock aircraft
-export function generateMockAircraft(overrides?: Partial<Aircraft>): Aircraft {
-  const category = aircraftCategories[Math.floor(Math.random() * aircraftCategories.length)]
-
-  return {
-    id: `ac_${Math.random().toString(36).substr(2, 9)}`,
-    callsign: callsigns[Math.floor(Math.random() * callsigns.length)],
-    icao24: Math.random().toString(16).substr(2, 6).toUpperCase(),
-    originCountry: countries[Math.floor(Math.random() * countries.length)],
-    position: generatePosition(),
-    velocity: generateVelocity(),
-    altitude: Math.floor(Math.random() * 40000) + 10000,
-    lastSeen: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+    id: `ac_${index.toString(36).padStart(6, '0')}`,
+    callsign: callsigns[Math.floor(random() * callsigns.length)],
+    icao24: Math.floor(random() * 16777215).toString(16).toUpperCase().padStart(6, '0'),
+    originCountry: countries[Math.floor(random() * countries.length)],
+    position: { latitude, longitude, altitude },
+    velocity: hasVelocity
+      ? {
+          heading: Math.floor(random() * 360),
+          speed: Math.floor(random() * 500) + 200,
+          verticalSpeed: Math.floor(random() * 2000) - 1000,
+        }
+      : null,
+    altitude,
+    lastSeen: new Date(Date.now() - Math.floor(random() * 3600000)).toISOString(),
     category,
-    registration: registrations[Math.floor(Math.random() * registrations.length)] ?? undefined,
-    ...overrides,
+    registration: registrations[Math.floor(random() * registrations.length)] ?? undefined,
   }
 }
 
 // Generate multiple mock aircraft
 export function generateMockAircraftList(count: number = 50): Aircraft[] {
-  return Array.from({ length: count }, () => generateMockAircraft())
+  return Array.from({ length: count }, (_, i) => generateSeededAircraft(i))
 }

@@ -1,0 +1,155 @@
+@use '@/styles/variables' as *;
+
+.waveform {
+  width: 80px;
+  height: 24px;
+  display: block;
+}
+
+.bar {
+  fill: $color-muted-foreground;
+  transition: fill $transition-fast;
+}
+
+// Active state enables animations
+.active .bar {
+  fill: $color-primary;
+}
+
+// --- Pattern-specific animations ---
+
+// Buzz: rapid height oscillation
+.buzz.active .bar {
+  fill: $color-chart-2;
+  animation: buzzAnim 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes buzzAnim {
+  0% {
+    y: 6;
+    height: 12;
+  }
+  100% {
+    y: 2;
+    height: 20;
+  }
+}
+
+// Pip: pulsing bars with sharp peaks
+.pip.active .bar {
+  fill: $color-chart-1;
+  animation: pipAnim 0.6s ease-in-out infinite;
+}
+
+@keyframes pipAnim {
+  0%, 100% {
+    y: 10;
+    height: 4;
+  }
+  15% {
+    y: 2;
+    height: 20;
+  }
+  30% {
+    y: 10;
+    height: 4;
+  }
+}
+
+// Sweep: wave traveling left-to-right
+.sweep.active .bar {
+  fill: $color-chart-3;
+  animation: sweepAnim 1.2s ease-in-out infinite;
+}
+
+@keyframes sweepAnim {
+  0%, 100% {
+    y: 10;
+    height: 4;
+  }
+  50% {
+    y: 2;
+    height: 20;
+  }
+}
+
+// Numbers: irregular, slower rhythm
+.numbers.active .bar {
+  fill: $color-chart-4;
+  animation: numbersAnim 1.8s ease-in-out infinite;
+}
+
+@keyframes numbersAnim {
+  0%, 100% {
+    y: 9;
+    height: 6;
+  }
+  20% {
+    y: 4;
+    height: 16;
+  }
+  40% {
+    y: 8;
+    height: 8;
+  }
+  60% {
+    y: 3;
+    height: 18;
+  }
+  80% {
+    y: 10;
+    height: 4;
+  }
+}
+
+// Morse: dot-dash grouping
+.morse.active .bar {
+  fill: $color-chart-5;
+  animation: morseAnim 1.5s step-end infinite;
+}
+
+@keyframes morseAnim {
+  0% {
+    y: 10;
+    height: 4;
+  }
+  10% {
+    y: 4;
+    height: 16;
+  }
+  20% {
+    y: 10;
+    height: 4;
+  }
+  30% {
+    y: 4;
+    height: 16;
+  }
+  40% {
+    y: 10;
+    height: 4;
+  }
+  50% {
+    y: 2;
+    height: 20;
+  }
+  70% {
+    y: 10;
+    height: 4;
+  }
+  80% {
+    y: 2;
+    height: 20;
+  }
+  100% {
+    y: 10;
+    height: 4;
+  }
+}
+
+// Silence: flat bars, no animation
+.silence .bar {
+  fill: $color-muted;
+  y: 11;
+  height: 2;
+}
