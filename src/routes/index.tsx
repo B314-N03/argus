@@ -1,113 +1,132 @@
+import { useMemo, useState, useCallback } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Radar, Waves, Radio, Activity, AlertTriangle } from 'lucide-react'
-import MainLayout from '@/components/layout/MainLayout'
-import { DashboardGrid, GridItem } from '@/components/layout/DashboardGrid'
-import StatCard from '@/components/ui/StatCard/StatCard'
-import Card from '@/components/ui/Card/Card'
-import { IndicatorsGrid, useIndicators } from '@/features/indicators'
-import type { TimeWindow } from '@/domain/models'
+import { GlobeLayout } from '@/components/layout/globe-layout/globe-layout'
+import {
+  GlobeView,
+  ActivityFeed,
+  NewsFeed,
+  TensionIndex,
+  DashboardHeader,
+  WidgetStack,
+  CountryModal,
+  NewsDetailModal,
+  useGlobeData,
+} from '@/features/dashboard'
+import type { NewsItem, Country } from '@/domain/models'
+import { generateTensionHistory } from '@/lib/api/mock/indicators'
+import { mockNewsItems } from '@/lib/api/mock/news'
+import { findCountryByName } from '@/lib/api/mock/countries'
+import styles from './index.module.scss'
 
 export const Route = createFileRoute('/')({
   component: DashboardPage,
 })
 
 function DashboardPage() {
-  const { data, isLoading } = useIndicators({ timeWindow: '24h' as TimeWindow })
+  const {
+    aircraftPoints,
+    vesselPoints,
+    signalPoints,
+    zones,
+    countries,
+    indicators,
+    vessels,
+    signals,
+  } = useGlobeData()
 
-  const summary = data?.summary
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null)
+  const [selectedNewsItem, setSelectedNewsItem] = useState<NewsItem | null>(null)
+
+  const tensionValue = useMemo(() => {
+    if (!indicators?.summary) return 35
+    const { averageDeviation, elevatedCount, anomalousCount } = indicators.summary
+    const deviationComponent = Math.min(Math.abs(averageDeviation) * 1.5, 40)
+    const elevatedComponent = Math.min(elevatedCount * 3, 30)
+    const anomalousComponent = Math.min(anomalousCount * 5, 30)
+    return Math.round(deviationComponent + elevatedComponent + anomalousComponent)
+  }, [indicators])
+
+  const tensionHistory = useMemo(() => {
+    if (!indicators?.indicators) return undefined
+    return generateTensionHistory(indicators.indicators)
+  }, [indicators])
+
+  const totalEntities = aircraftPoints.length + vesselPoints.length + signalPoints.length
+  const activeRegions = zones.filter((z) => z.active).length
+
+  const aircraftForFeed = useMemo(() => {
+    return aircraftPoints.map((p) => ({
+      id: p.id,
+      callsign: p.label,
+      icao24: p.id,
+      originCountry: 'Unknown',
+      position: { latitude: p.lat, longitude: p.lng, altitude: 0 },
+      velocity: null,
+      altitude: null,
+      lastSeen: new Date(Date.now() - Math.random() * 3600000).toISOString(),
+      category: (p as { category?: string }).category ?? 'unknown',
+    }))
+  }, [aircraftPoints])
+
+  const handleCountrySelect = useCallback((name: string) => {
+    const country = findCountryByName(name)
+    if (country) {
+      setSelectedCountry(country)
+    }
+  }, [])
+
+  const handleNewsItemClick = useCallback((item: NewsItem) => {
+    setSelectedNewsItem(item)
+  }, [])
 
   return (
-    <MainLayout>
-      <div style={{ paddingBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--color-foreground)' }}>
-          Global Activity Overview
-        </h1>
-        <p style={{ color: 'var(--color-muted-foreground)', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-          Real-time situational awareness dashboard
-        </p>
-
-        <DashboardGrid>
-          <GridItem>
-            <StatCard
-              label="Air Activity"
-              value="2,847"
-              trend="up"
-              trendValue="+12.3%"
-              description="Aircraft tracked in last 24h"
-              icon={<Radar size={20} />}
+    <>
+      <GlobeLayout
+        header={<DashboardHeader activeRegions={activeRegions} totalEntities={totalEntities} />}
+        left={
+          <div className={styles.leftColumn}>
+            <ActivityFeed
+              aircraft={aircraftForFeed as never[]}
+              vessels={vessels}
+              signals={signals}
             />
-          </GridItem>
-          <GridItem>
-            <StatCard
-              label="Naval Vessels"
-              value="1,432"
-              trend="up"
-              trendValue="+5.7%"
-              description="Vessels detected globally"
-              icon={<Waves size={20} />}
+            <div className={styles.feedDivider}>OSINT Sources</div>
+            <NewsFeed items={mockNewsItems} onItemClick={handleNewsItemClick} />
+          </div>
+        }
+        center={
+          <>
+            <GlobeView
+              aircraftPoints={aircraftPoints}
+              vesselPoints={vesselPoints}
+              signalPoints={signalPoints}
+              zones={zones}
+              countries={countries}
+              onCountrySelect={handleCountrySelect}
             />
-          </GridItem>
-          <GridItem>
-            <StatCard
-              label="Signal Events"
-              value="18,294"
-              trend="down"
-              trendValue="-2.1%"
-              description="Signals captured today"
-              icon={<Radio size={20} />}
-            />
-          </GridItem>
-          <GridItem>
-            <StatCard
-              label="Active Indicators"
-              value={summary?.totalIndicators ?? 12}
-              trend="up"
-              trendValue="+3"
-              description="Elevated activity regions"
-              icon={<Activity size={20} />}
-            />
-          </GridItem>
-        </DashboardGrid>
-
-        <div style={{ marginTop: '2rem' }}>
-          <Card padding="lg">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-              <AlertTriangle size={20} style={{ color: 'var(--color-chart-3)' }} />
-              <h2 style={{ fontSize: '1.125rem', fontWeight: '600', margin: 0, color: 'var(--color-foreground)' }}>
-                Activity Summary
-              </h2>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-              <div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--color-muted-foreground)' }}>Elevated Regions</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-chart-2)' }}>
-                  {summary?.elevatedCount ?? 0}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--color-muted-foreground)' }}>Anomalies Detected</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-destructive)' }}>
-                  {summary?.anomalousCount ?? 0}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--color-muted-foreground)' }}>Average Deviation</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--color-chart-1)' }}>
-                  {summary?.averageDeviation != null ? `${summary.averageDeviation > 0 ? '+' : ''}${summary.averageDeviation}%` : 'N/A'}
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        <div style={{ marginTop: '2rem' }}>
-          <IndicatorsGrid
-            indicators={data?.indicators ?? []}
-            isLoading={isLoading}
-            timeWindow="24h"
+            <TensionIndex value={tensionValue} history={tensionHistory} />
+          </>
+        }
+        right={
+          <WidgetStack
+            indicatorData={indicators}
+            aircraftCount={aircraftPoints.length}
+            vesselCount={vesselPoints.length}
+            signalCount={signalPoints.length}
+            aircraftPoints={aircraftPoints}
+            vesselPoints={vesselPoints}
           />
-        </div>
-      </div>
-    </MainLayout>
+        }
+      />
+      <CountryModal
+        country={selectedCountry}
+        newsItems={mockNewsItems}
+        onClose={() => setSelectedCountry(null)}
+      />
+      <NewsDetailModal
+        item={selectedNewsItem}
+        onClose={() => setSelectedNewsItem(null)}
+      />
+    </>
   )
 }

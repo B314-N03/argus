@@ -1,0 +1,111 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.header {
+  @include flex-between;
+  padding: $spacing-3 $spacing-4;
+  border-bottom: 1px solid $color-border;
+}
+
+.title {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.settingsWrapper {
+  position: relative;
+}
+
+.settingsButton {
+  @include button-ghost;
+  padding: $spacing-1;
+  color: $color-muted-foreground;
+  border-radius: $radius-sm;
+
+  &:hover {
+    color: $color-foreground;
+  }
+}
+
+.widgets {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-3;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+  @include custom-scrollbar;
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-2;
+}
+
+.widgetTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+}
+
+.iconAircraft {
+  color: $color-chart-1;
+}
+
+.iconVessel {
+  color: $color-chart-2;
+}
+
+.iconSignal {
+  color: $color-chart-3;
+}
+
+.iconIndicator {
+  color: $color-chart-4;
+}
+
+.miniStats {
+  display: flex;
+  gap: $spacing-4;
+}
+
+.miniStat {
+  display: flex;
+  flex-direction: column;
+}
+
+.miniValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-chart-3;
+}
+
+.anomalous {
+  color: $color-destructive;
+}
+
+.miniLabel {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}
+
+.bigValue {
+  display: block;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+  line-height: 1;
+  margin-bottom: $spacing-1;
+}

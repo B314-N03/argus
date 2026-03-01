@@ -1,0 +1,87 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.sourceLine {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.sourceIcon {
+  color: $color-primary;
+}
+
+.sourceInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sourceName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.sourceAuthor {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}
+
+.body {
+  font-size: $font-size-sm;
+  color: $color-foreground;
+  line-height: 1.6;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  flex-wrap: wrap;
+}
+
+.timestamp {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+}
+
+.regionBadge {
+  font-size: $font-size-xs;
+  padding: $spacing-1 $spacing-2;
+  background-color: rgba($color-primary, 0.1);
+  color: $color-primary;
+  border-radius: $radius-sm;
+  border: 1px solid rgba($color-primary, 0.2);
+  text-transform: capitalize;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.tag {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  background-color: rgba($color-muted, 0.5);
+  padding: $spacing-1 $spacing-2;
+  border-radius: $radius-sm;
+}
+
+.sourceLink {
+  @include button-secondary;
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-2;
+  text-decoration: none;
+  width: fit-content;
+  font-size: $font-size-xs;
+}

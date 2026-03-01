@@ -1,0 +1,83 @@
+@use '@/styles/variables' as *;
+@use '@/styles/breakpoints' as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-3 $spacing-4;
+  background-color: $color-card;
+  flex-wrap: wrap;
+  gap: $spacing-3;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-2;
+}
+
+.name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  letter-spacing: 0.1em;
+}
+
+.subtitle {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  display: none;
+
+  @include md {
+    display: inline;
+  }
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+}
+
+.statLabel {
+  font-size: 10px;
+  color: $color-muted-foreground;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: $color-border;
+}
+
+.utc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.utcLabel {
+  font-size: 10px;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+}
+
+.utcTime {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-chart-2;
+  font-family: $font-family-mono;
+}

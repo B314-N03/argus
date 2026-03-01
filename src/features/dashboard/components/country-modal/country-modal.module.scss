@@ -1,0 +1,114 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+  padding-bottom: $spacing-2;
+  border-bottom: 1px solid $color-border;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-3;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fieldLabel {
+  font-size: 10px;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fieldValue {
+  font-size: $font-size-sm;
+  color: $color-foreground;
+  font-weight: $font-weight-medium;
+}
+
+.fieldValueLarge {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+}
+
+.branchList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.branchBadge {
+  font-size: $font-size-xs;
+  padding: $spacing-1 $spacing-2;
+  background-color: rgba($color-primary, 0.1);
+  color: $color-primary;
+  border-radius: $radius-sm;
+  border: 1px solid rgba($color-primary, 0.2);
+}
+
+.allianceList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+}
+
+.allianceBadge {
+  font-size: $font-size-xs;
+  padding: $spacing-1 $spacing-2;
+  background-color: rgba($color-chart-3, 0.1);
+  color: $color-chart-3;
+  border-radius: $radius-sm;
+  border: 1px solid rgba($color-chart-3, 0.2);
+}
+
+.newsSection {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.newsItem {
+  padding: $spacing-2 $spacing-3;
+  background-color: rgba($color-muted, 0.3);
+  border-radius: $radius-md;
+  font-size: $font-size-xs;
+  color: $color-foreground;
+  line-height: 1.4;
+}
+
+.newsSource {
+  font-size: 10px;
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+  margin-bottom: 2px;
+}
+
+.noData {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  font-style: italic;
+}

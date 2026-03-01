@@ -1,0 +1,115 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+  margin-bottom: $spacing-1;
+}
+
+.icon {
+  color: $color-chart-5;
+}
+
+.title {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+  max-height: 240px;
+  overflow-y: auto;
+  @include custom-scrollbar;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+  padding: $spacing-2;
+  background-color: rgba($color-muted, 0.2);
+  border-radius: $radius-md;
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-2;
+}
+
+.name {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+  @include text-truncate;
+}
+
+.riskBadge {
+  font-size: 10px;
+  padding: 1px $spacing-2;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.riskLow {
+  background-color: rgba($color-chart-2, 0.15);
+  color: $color-chart-2;
+}
+
+.riskModerate {
+  background-color: rgba($color-chart-3, 0.15);
+  color: $color-chart-3;
+}
+
+.riskElevated {
+  background-color: rgba($color-chart-3, 0.25);
+  color: $color-chart-3;
+}
+
+.riskHigh {
+  background-color: rgba($color-destructive, 0.15);
+  color: $color-destructive;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+}
+
+.stat {
+  font-size: 10px;
+  color: $color-muted-foreground;
+
+  strong {
+    color: $color-foreground;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.barContainer {
+  height: 3px;
+  background-color: rgba($color-muted, 0.5);
+  border-radius: $radius-full;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  border-radius: $radius-full;
+  transition: width $transition-base;
+}

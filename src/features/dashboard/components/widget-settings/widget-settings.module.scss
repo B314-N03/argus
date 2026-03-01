@@ -1,0 +1,80 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-popover - 1;
+}
+
+.popover {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: $spacing-2;
+  z-index: $z-popover;
+  min-width: 200px;
+  @include card-base;
+  box-shadow: $shadow-xl;
+  padding: $spacing-3;
+}
+
+.title {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: $spacing-3;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-3;
+}
+
+.label {
+  font-size: $font-size-sm;
+  color: $color-foreground;
+}
+
+.toggle {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  background-color: $color-muted;
+  border-radius: $radius-full;
+  border: none;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+  padding: 0;
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background-color: $color-foreground;
+    border-radius: $radius-full;
+    transition: transform $transition-fast;
+  }
+}
+
+.toggleActive {
+  background-color: $color-primary;
+
+  &::after {
+    transform: translateX(14px);
+  }
+}

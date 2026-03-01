@@ -1,0 +1,90 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.icon {
+  color: $color-chart-4;
+}
+
+.title {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-foreground;
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2;
+}
+
+.groupTitle {
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-1 $spacing-2;
+  background-color: rgba($color-muted, 0.15);
+  border-radius: $radius-sm;
+}
+
+.label {
+  font-size: $font-size-xs;
+  color: $color-foreground;
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+}
+
+.value {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+}
+
+.divider {
+  height: 1px;
+  background-color: $color-border;
+}
+
+.totalRow {
+  @extend .row;
+  background-color: rgba($color-primary, 0.08);
+}

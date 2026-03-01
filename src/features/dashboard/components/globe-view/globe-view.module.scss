@@ -1,0 +1,26 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.container {
+  flex: 1;
+  min-height: 400px;
+  position: relative;
+  background-color: #000810;
+  overflow: hidden;
+
+  :global(.scene-tooltip) {
+    z-index: 1070 !important;
+  }
+}
+
+.loading {
+  @include flex-center;
+  flex: 1;
+  min-height: 300px;
+  background-color: #000810;
+}
+
+.loadingText {
+  color: $color-muted-foreground;
+  font-size: $font-size-sm;
+}
