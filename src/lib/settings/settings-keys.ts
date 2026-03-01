@@ -1,6 +1,8 @@
 export const SETTINGS_KEYS = {
   VISIBLE_WIDGETS: 'argus.widgets.visible',
   GLOBE_ENTITY_FILTERS: 'argus.globe.entityFilters',
+  SIDEBAR_STATE: 'argus.ui.sidebarState',
+  FEED_SPLIT: 'argus.ui.feedSplit',
 } as const
 
 export interface WidgetVisibility {
@@ -33,4 +35,30 @@ export const DEFAULT_GLOBE_ENTITY_FILTERS: GlobeEntityFilters = {
   aircraft: true,
   vessel: true,
   signal: true,
+}
+
+export interface SidebarState {
+  leftWidth: number
+  rightWidth: number
+  leftCollapsed: boolean
+  rightCollapsed: boolean
+}
+
+export const DEFAULT_SIDEBAR_STATE: SidebarState = {
+  leftWidth: 280,
+  rightWidth: 280,
+  leftCollapsed: false,
+  rightCollapsed: false,
+}
+
+export interface FeedSplitState {
+  topRatio: number
+  topCollapsed: boolean
+  bottomCollapsed: boolean
+}
+
+export const DEFAULT_FEED_SPLIT_STATE: FeedSplitState = {
+  topRatio: 0.5,
+  topCollapsed: false,
+  bottomCollapsed: false,
 }
