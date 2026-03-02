@@ -1,241 +1,289 @@
-import { useRef, useEffect, useState, Suspense, lazy, useCallback, useMemo } from 'react'
-import { Sprite, SpriteMaterial, CanvasTexture } from 'three'
-import type { Zone, ZoneType, AircraftCategory, ShipType, SignalType } from '@/domain/models'
+import {
+  useRef,
+  useEffect,
+  useState,
+  Suspense,
+  lazy,
+  useCallback,
+  useMemo,
+} from "react";
+
+import { Sprite, SpriteMaterial, CanvasTexture } from "three";
+
+import type {
+  Zone,
+  ZoneType,
+  AircraftCategory,
+  ShipType,
+  SignalType,
+} from "@/domain/models";
 import {
   getAircraftCategoryLabel,
   getShipTypeLabel,
   getSignalTypeLabel,
   getZoneTypeLabel,
   buildZonePolygonGeometry,
-} from '@/domain/models'
+} from "@/domain/models";
 import {
   useSettings,
   SETTINGS_KEYS,
   DEFAULT_GLOBE_ENTITY_FILTERS,
-} from '@/lib/settings'
-import type { GlobeEntityFilters } from '@/lib/settings'
-import { getEntityIconSvg } from './globe-entity-icon'
-import { GlobeEntityFilter } from './globe-entity-filter'
-import styles from './globe-view.module.scss'
+  DEFAULT_GLOBE_SETTINGS,
+} from "@/lib/settings";
+import type { GlobeEntityFilters, GlobeSettings } from "@/lib/settings";
+
+import {
+  TEXTURE_URLS,
+  BACKGROUND_CONFIG,
+  ATMOSPHERE_COLORS,
+  ATMOSPHERE_ALTITUDES,
+} from "../globe-settings/globe-settings-constants";
+import { GlobeSettingsTrigger } from "../globe-settings/globe-settings-trigger";
+
+import { GlobeEntityFilter } from "./globe-entity-filter";
+import { getEntityIconSvg } from "./globe-entity-icon";
+import styles from "./globe-view.module.scss";
 
 export interface GlobePoint {
-  id: string
-  lat: number
-  lng: number
-  label: string | null
-  type: 'aircraft' | 'vessel' | 'signal'
-  category?: AircraftCategory
-  shipType?: ShipType
-  signalType?: SignalType
+  id: string;
+  lat: number;
+  lng: number;
+  label: string | null;
+  type: "aircraft" | "vessel" | "signal";
+  category?: AircraftCategory;
+  shipType?: ShipType;
+  signalType?: SignalType;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type GeoJSONFeature = any
+type GeoJSONFeature = any;
 
 interface ZonePolygon {
-  _kind: 'zone'
-  zone: Zone
-  geometry: ReturnType<typeof buildZonePolygonGeometry>
-  color: string
+  _kind: "zone";
+  zone: Zone;
+  geometry: ReturnType<typeof buildZonePolygonGeometry>;
+  color: string;
 }
 
 function isZonePolygon(d: object): d is ZonePolygon {
-  return '_kind' in d && (d as ZonePolygon)._kind === 'zone'
+  return "_kind" in d;
 }
 
 interface ZoneBadgeData {
-  lat: number
-  lng: number
-  text: string
-  color: string
-  zone: Zone
+  lat: number;
+  lng: number;
+  text: string;
+  color: string;
+  zone: Zone;
 }
 
 interface GlobeViewProps {
-  aircraftPoints: GlobePoint[]
-  vesselPoints: GlobePoint[]
-  signalPoints: GlobePoint[]
-  zones: Zone[]
-  countries?: GeoJSONFeature[]
-  onCountrySelect?: (countryName: string) => void
+  aircraftPoints: GlobePoint[];
+  vesselPoints: GlobePoint[];
+  signalPoints: GlobePoint[];
+  zones: Zone[];
+  countries?: GeoJSONFeature[];
+  onCountrySelect?: (countryName: string) => void;
 }
 
-const GlobeGL = lazy(() => import('react-globe.gl'))
+const GlobeGL = lazy(() => import("react-globe.gl"));
 
-function GlobeLoading() {
+const GlobeLoading = () => {
   return (
     <div className={styles.loading}>
       <div className={styles.loadingText}>Initializing globe...</div>
     </div>
-  )
-}
+  );
+};
 
 const ZONE_TYPE_DESCRIPTION: Record<string, string> = {
   notam:
-    'Notice to Air Missions — Issued when airspace restrictions are activated due to military exercises, hazardous conditions, or temporary flight restrictions.',
+    "Notice to Air Missions — Issued when airspace restrictions are activated due to military exercises, hazardous conditions, or temporary flight restrictions.",
   exclusion:
-    'Exclusion Zone — A designated area where civilian access is restricted. Typically declared during active military operations or heightened security.',
+    "Exclusion Zone — A designated area where civilian access is restricted. Typically declared during active military operations or heightened security.",
   blockade:
-    'Naval Blockade Zone — Maritime area with restricted vessel transit. Coalition or national forces actively monitoring and controlling shipping lanes.',
+    "Naval Blockade Zone — Maritime area with restricted vessel transit. Coalition or national forces actively monitoring and controlling shipping lanes.",
   duty_zone:
-    'Active Patrol Zone — Area with sustained military patrol presence. Forces maintain continuous surveillance and readiness posture.',
-}
+    "Active Patrol Zone — Area with sustained military patrol presence. Forces maintain continuous surveillance and readiness posture.",
+};
 
 const SEVERITY_LABEL: Record<string, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
-}
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+};
 
 const ZONE_TYPE_COLOR: Record<ZoneType, string> = {
-  notam: '#00d4ff',
-  exclusion: '#f4212e',
-  blockade: '#f4900c',
-  duty_zone: '#1d9bf0',
-}
+  notam: "#00d4ff",
+  exclusion: "#f4212e",
+  blockade: "#f4900c",
+  duty_zone: "#1d9bf0",
+};
 
 const ZONE_TYPE_ABBR: Record<ZoneType, string> = {
-  notam: 'N',
-  exclusion: 'X',
-  blockade: 'B',
-  duty_zone: 'P',
-}
+  notam: "N",
+  exclusion: "X",
+  blockade: "B",
+  duty_zone: "P",
+};
 
-const ZONE_FILL_OPACITY = '1a' // ~10% fill
-const ZONE_STROKE_OPACITY = '88' // ~53% stroke
+const ZONE_FILL_OPACITY = "1a"; // ~10% fill
+const ZONE_STROKE_OPACITY = "88"; // ~53% stroke
 
-const GLOBE_RADIUS = 100
-const BADGE_ALTITUDE = 0.012
+const GLOBE_RADIUS = 100;
+const BADGE_ALTITUDE = 0.012;
 
 function polar2Cartesian(lat: number, lng: number, alt: number) {
-  const phi = ((90 - lat) * Math.PI) / 180
-  const theta = ((90 - lng) * Math.PI) / 180
-  const r = GLOBE_RADIUS * (1 + alt)
+  const phi = ((90 - lat) * Math.PI) / 180;
+  const theta = ((90 - lng) * Math.PI) / 180;
+  const r = GLOBE_RADIUS * (1 + alt);
+
   return {
     x: r * Math.sin(phi) * Math.cos(theta),
     y: r * Math.cos(phi),
     z: r * Math.sin(phi) * Math.sin(theta),
-  }
+  };
 }
 
 function createZoneBadgeSprite(text: string, color: string): Sprite {
-  const size = 128
-  const canvas = document.createElement('canvas')
-  canvas.width = size
-  canvas.height = size
-  const ctx = canvas.getContext('2d')!
+  const size = 128;
+  const canvas = document.createElement("canvas");
+
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
 
   // Circle background
-  ctx.beginPath()
-  ctx.arc(size / 2, size / 2, size / 2 - 4, 0, Math.PI * 2)
-  ctx.fillStyle = `${color}33`
-  ctx.fill()
-  ctx.strokeStyle = color
-  ctx.lineWidth = 4
-  ctx.stroke()
+  ctx.beginPath();
+  ctx.arc(size / 2, size / 2, size / 2 - 4, 0, Math.PI * 2);
+  ctx.fillStyle = `${color}33`;
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+  ctx.stroke();
 
   // Centered text
-  ctx.fillStyle = color
-  ctx.font = 'bold 52px sans-serif'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText(text, size / 2, size / 2)
+  ctx.fillStyle = color;
+  ctx.font = "bold 52px sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, size / 2, size / 2);
 
-  const texture = new CanvasTexture(canvas)
+  const texture = new CanvasTexture(canvas);
   const material = new SpriteMaterial({
     map: texture,
     transparent: true,
     depthWrite: false,
-  })
-  const sprite = new Sprite(material)
-  sprite.scale.set(5, 5, 1)
-  return sprite
+  });
+  const sprite = new Sprite(material);
+
+  sprite.scale.set(5, 5, 1);
+
+  return sprite;
 }
 
 function buildEntityTooltipHtml(point: GlobePoint): string {
-  const name = point.label ?? point.id
-  let typeLabel = ''
-  let details = ''
+  const name = point.label ?? point.id;
+  let typeLabel = "";
+  let details = "";
 
-  if (point.type === 'aircraft') {
-    typeLabel = getAircraftCategoryLabel(point.category ?? 'unknown') + ' Aircraft'
-    details = `<div style="margin-top:4px;font-size:11px;color:#71767b">Callsign: ${name}</div>`
-  } else if (point.type === 'vessel') {
-    typeLabel = getShipTypeLabel(point.shipType ?? 'unknown')
-    details = `<div style="margin-top:4px;font-size:11px;color:#71767b">Name: ${name}</div>`
+  if (point.type === "aircraft") {
+    typeLabel =
+      getAircraftCategoryLabel(point.category ?? "unknown") + " Aircraft";
+    details = `<div style="margin-top:4px;font-size:11px;color:#71767b">Callsign: ${name}</div>`;
+  } else if (point.type === "vessel") {
+    typeLabel = getShipTypeLabel(point.shipType ?? "unknown");
+    details = `<div style="margin-top:4px;font-size:11px;color:#71767b">Name: ${name}</div>`;
   } else {
-    typeLabel = getSignalTypeLabel(point.signalType ?? 'unknown') + ' Signal'
-    details = `<div style="margin-top:4px;font-size:11px;color:#71767b">Source: ${name}</div>`
+    typeLabel = getSignalTypeLabel(point.signalType ?? "unknown") + " Signal";
+    details = `<div style="margin-top:4px;font-size:11px;color:#71767b">Source: ${name}</div>`;
   }
 
   const typeColor =
-    point.type === 'aircraft'
-      ? '#1d9bf0'
-      : point.type === 'vessel'
-        ? '#18b76f'
-        : '#f4900c'
+    point.type === "aircraft"
+      ? "#1d9bf0"
+      : point.type === "vessel"
+        ? "#18b76f"
+        : "#f4900c";
 
   return `<div style="background:#16181c;padding:8px 12px;border-radius:6px;border:1px solid #2f3336;min-width:160px;pointer-events:none">
     <div style="font-size:12px;font-weight:600;color:${typeColor}">${typeLabel}</div>
     ${details}
     <div style="margin-top:4px;font-size:10px;color:#71767b">Position: ${point.lat.toFixed(2)}°, ${point.lng.toFixed(2)}°</div>
-  </div>`
+  </div>`;
 }
 
 function buildZoneTooltipHtml(zone: Zone): string {
-  const typeLabel = getZoneTypeLabel(zone.type)
-  const typeDesc = ZONE_TYPE_DESCRIPTION[zone.type] ?? ''
-  const severityLabel = SEVERITY_LABEL[zone.severity] ?? zone.severity
+  const typeLabel = getZoneTypeLabel(zone.type);
+  const typeDesc = ZONE_TYPE_DESCRIPTION[zone.type] ?? "";
+  const severityLabel = SEVERITY_LABEL[zone.severity] ?? zone.severity;
   const severityColor =
-    zone.severity === 'high' ? '#f4212e' : zone.severity === 'medium' ? '#f4900c' : '#1d9bf0'
-  const color = ZONE_TYPE_COLOR[zone.type]
+    zone.severity === "high"
+      ? "#f4212e"
+      : zone.severity === "medium"
+        ? "#f4900c"
+        : "#1d9bf0";
+  const color = ZONE_TYPE_COLOR[zone.type];
 
   return `<div style="background:#16181c;padding:10px 14px;border-radius:6px;border:1px solid #2f3336;max-width:280px;pointer-events:none">
     <div style="font-size:13px;font-weight:600;color:${color};margin-bottom:4px">${typeLabel}: ${zone.name}</div>
     <div style="font-size:11px;color:#e7e9ea;line-height:1.5;margin-bottom:6px">${typeDesc}</div>
     <div style="display:flex;gap:12px;font-size:11px">
       <span style="color:#71767b">Severity: <span style="color:${severityColor};font-weight:600">${severityLabel}</span></span>
-      <span style="color:#71767b">Radius: ${zone.radius ?? '—'} km</span>
+      <span style="color:#71767b">Radius: ${zone.radius ?? "—"} km</span>
     </div>
     <div style="margin-top:6px;font-size:11px;color:#71767b;line-height:1.4">${zone.description}</div>
-  </div>`
+  </div>`;
 }
 
-function GlobeRenderer({
+const GlobeRenderer = ({
   aircraftPoints,
   vesselPoints,
   signalPoints,
   zones,
   countries,
   onCountrySelect,
-}: GlobeViewProps) {
+}: GlobeViewProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const globeRef = useRef<any>(undefined)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const tooltipRef = useRef<HTMLDivElement>(null)
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
-  const [hoverCountry, setHoverCountry] = useState<GeoJSONFeature | null>(null)
-  const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null)
+  const globeRef = useRef<any>(undefined);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [hoverCountry, setHoverCountry] = useState<GeoJSONFeature | null>(null);
+  const [hoveredZoneId, setHoveredZoneId] = useState<string | null>(null);
   const [filters, setFilters] = useSettings<GlobeEntityFilters>(
     SETTINGS_KEYS.GLOBE_ENTITY_FILTERS,
     DEFAULT_GLOBE_ENTITY_FILTERS,
-  )
+  );
+  const [globeSettings, setGlobeSettings] = useSettings<GlobeSettings>(
+    SETTINGS_KEYS.GLOBE_SETTINGS,
+    DEFAULT_GLOBE_SETTINGS,
+  );
+
+  const resolvedTexture = TEXTURE_URLS[globeSettings.texture];
+  const resolvedBg = BACKGROUND_CONFIG[globeSettings.background];
+  const resolvedAtmosphereColor =
+    ATMOSPHERE_COLORS[globeSettings.atmosphereColor];
+  const resolvedAtmosphereAlt = globeSettings.showAtmosphere
+    ? ATMOSPHERE_ALTITUDES[globeSettings.atmosphereAltitude]
+    : 0;
 
   useEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current) return;
 
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         setDimensions({
           width: entry.contentRect.width,
           height: entry.contentRect.height,
-        })
+        });
       }
-    })
+    });
 
-    observer.observe(containerRef.current)
-    return () => observer.disconnect()
-  }, [])
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   const entityPoints = useMemo(
     () => [
@@ -244,7 +292,7 @@ function GlobeRenderer({
       ...(filters.signal ? signalPoints : []),
     ],
     [aircraftPoints, vesselPoints, signalPoints, filters],
-  )
+  );
 
   const zoneBadgeData: ZoneBadgeData[] = useMemo(
     () =>
@@ -258,158 +306,191 @@ function GlobeRenderer({
           zone: z,
         })),
     [zones],
-  )
+  );
 
   const zonePolygons: ZonePolygon[] = useMemo(
     () =>
       zones
         .filter((z) => z.active && z.radius)
         .map((z) => ({
-          _kind: 'zone' as const,
+          _kind: "zone" as const,
           zone: z,
           geometry: buildZonePolygonGeometry(z.center, z.radius!),
           color: ZONE_TYPE_COLOR[z.type],
         })),
     [zones],
-  )
+  );
 
   const allPolygons = useMemo(
     () => [...(countries ?? []), ...zonePolygons],
     [countries, zonePolygons],
-  )
+  );
 
-  const showEntityTooltip = useCallback((el: HTMLElement, point: GlobePoint) => {
-    const tooltip = tooltipRef.current
-    if (!tooltip || !containerRef.current) return
-    const containerRect = containerRef.current.getBoundingClientRect()
-    const elRect = el.getBoundingClientRect()
-    tooltip.innerHTML = buildEntityTooltipHtml(point)
-    tooltip.style.display = 'block'
-    tooltip.style.left = `${elRect.left - containerRect.left + elRect.width / 2}px`
-    tooltip.style.top = `${elRect.top - containerRect.top - 8}px`
-  }, [])
+  const showEntityTooltip = useCallback(
+    (el: HTMLElement, point: GlobePoint) => {
+      const tooltip = tooltipRef.current;
+
+      if (!tooltip || !containerRef.current) return;
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+
+      tooltip.innerHTML = buildEntityTooltipHtml(point);
+      tooltip.style.display = "block";
+      tooltip.style.left = `${elRect.left - containerRect.left + elRect.width / 2}px`;
+      tooltip.style.top = `${elRect.top - containerRect.top - 8}px`;
+    },
+    [],
+  );
 
   const hideEntityTooltip = useCallback(() => {
-    const tooltip = tooltipRef.current
+    const tooltip = tooltipRef.current;
+
     if (tooltip) {
-      tooltip.style.display = 'none'
+      tooltip.style.display = "none";
     }
-  }, [])
+  }, []);
 
   const htmlElement = useCallback(
     (d: object) => {
-      const point = d as GlobePoint
-      const el = document.createElement('div')
-      el.innerHTML = getEntityIconSvg(point)
-      el.style.cursor = 'pointer'
-      el.style.pointerEvents = 'auto'
-      el.addEventListener('mouseenter', () => showEntityTooltip(el, point))
-      el.addEventListener('mouseleave', hideEntityTooltip)
-      return el
+      const point = d as GlobePoint;
+      const el = document.createElement("div");
+
+      el.innerHTML = getEntityIconSvg(point);
+      el.style.cursor = "pointer";
+      el.style.pointerEvents = "auto";
+      el.addEventListener("mouseenter", () => showEntityTooltip(el, point));
+      el.addEventListener("mouseleave", hideEntityTooltip);
+
+      return el;
     },
     [showEntityTooltip, hideEntityTooltip],
-  )
+  );
 
   // Zone badges as WebGL sprites via custom layer
   const customThreeObject = useCallback((d: object) => {
-    const item = d as ZoneBadgeData
-    const sprite = createZoneBadgeSprite(item.text, item.color)
-    const pos = polar2Cartesian(item.lat, item.lng, BADGE_ALTITUDE)
-    sprite.position.set(pos.x, pos.y, pos.z)
-    return sprite
-  }, [])
+    const item = d as ZoneBadgeData;
+    const sprite = createZoneBadgeSprite(item.text, item.color);
+    const pos = polar2Cartesian(item.lat, item.lng, BADGE_ALTITUDE);
+
+    sprite.position.set(pos.x, pos.y, pos.z);
+
+    return sprite;
+  }, []);
 
   const customLayerLabel = useCallback((d: object) => {
-    const item = d as ZoneBadgeData
-    return buildZoneTooltipHtml(item.zone)
-  }, [])
+    const item = d as ZoneBadgeData;
+
+    return buildZoneTooltipHtml(item.zone);
+  }, []);
 
   const polygonCapColor = useCallback(
     (d: object) => {
       if (isZonePolygon(d)) {
         return hoveredZoneId === d.zone.id
           ? `${d.color}33`
-          : `${d.color}${ZONE_FILL_OPACITY}`
+          : `${d.color}${ZONE_FILL_OPACITY}`;
       }
-      return d === hoverCountry ? 'rgba(29, 155, 240, 0.15)' : 'rgba(0, 0, 0, 0)'
+
+      return d === hoverCountry
+        ? "rgba(29, 155, 240, 0.15)"
+        : "rgba(0, 0, 0, 0)";
     },
     [hoverCountry, hoveredZoneId],
-  )
+  );
 
-  const polygonSideColor = useCallback(() => 'rgba(0, 0, 0, 0)', [])
+  const polygonSideColor = useCallback(() => "rgba(0, 0, 0, 0)", []);
 
   const polygonStrokeColor = useCallback(
     (d: object) => {
       if (isZonePolygon(d)) {
         return hoveredZoneId === d.zone.id
           ? `${d.color}cc`
-          : `${d.color}${ZONE_STROKE_OPACITY}`
+          : `${d.color}${ZONE_STROKE_OPACITY}`;
       }
-      return d === hoverCountry ? 'rgba(255, 215, 0, 0.8)' : 'rgba(47, 51, 54, 0.3)'
+
+      return d === hoverCountry
+        ? "rgba(255, 215, 0, 0.8)"
+        : "rgba(47, 51, 54, 0.3)";
     },
     [hoverCountry, hoveredZoneId],
-  )
+  );
 
   const polygonAltitude = useCallback(
     (d: object) => {
       if (isZonePolygon(d)) {
-        return hoveredZoneId === d.zone.id ? 0.008 : 0.002
+        return hoveredZoneId === d.zone.id ? 0.008 : 0.002;
       }
-      return d === hoverCountry ? 0.005 : 0.001
+
+      return d === hoverCountry ? 0.005 : 0.001;
     },
     [hoverCountry, hoveredZoneId],
-  )
+  );
 
   const polygonLabel = useCallback((d: object) => {
-    if (isZonePolygon(d)) return buildZoneTooltipHtml(d.zone)
+    if (isZonePolygon(d)) return buildZoneTooltipHtml(d.zone);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const feat = d as any
-    const name = feat?.properties?.name ?? ''
-    return `<div style="background:#16181c;padding:4px 8px;border-radius:4px;border:1px solid #2f3336;font-size:12px;color:#e7e9ea">${name}</div>`
-  }, [])
+    const feat = d as any;
+    const name = feat?.properties?.name ?? "";
+
+    return `<div style="background:#16181c;padding:4px 8px;border-radius:4px;border:1px solid #2f3336;font-size:12px;color:#e7e9ea">${name}</div>`;
+  }, []);
 
   const polygonGeoJsonGeometry = useCallback((d: object) => {
-    if (isZonePolygon(d)) return d.geometry
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (d as any)?.geometry
-  }, [])
+    if (isZonePolygon(d)) return d.geometry;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GeoJSON features lack strict typing
+    return (d as any)?.geometry;
+  }, []);
 
   const handlePolygonHover = useCallback((d: object | null) => {
     if (d && isZonePolygon(d)) {
-      setHoveredZoneId(d.zone.id)
-      return
+      setHoveredZoneId(d.zone.id);
+
+      return;
     }
-    setHoveredZoneId(null)
-    setHoverCountry(d)
-  }, [])
+
+    setHoveredZoneId(null);
+    setHoverCountry(d);
+  }, []);
 
   const handlePolygonClick = useCallback(
     (d: object | null) => {
-      if (!d || !onCountrySelect || isZonePolygon(d)) return
+      if (!d || !onCountrySelect || isZonePolygon(d)) return;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const feat = d as any
-      const name = feat?.properties?.name
+      const feat = d as any;
+      const name = feat?.properties?.name;
+
       if (name) {
-        onCountrySelect(name)
+        onCountrySelect(name);
       }
     },
     [onCountrySelect],
-  )
+  );
 
   return (
-    <div ref={containerRef} className={styles.container}>
+    <div
+      ref={containerRef}
+      className={styles.container}
+      style={resolvedBg.url ? undefined : { backgroundColor: resolvedBg.color }}
+    >
       <div ref={tooltipRef} className={styles.entityTooltip} />
       <GlobeEntityFilter filters={filters} onChange={setFilters} />
+      <GlobeSettingsTrigger
+        settings={globeSettings}
+        onChange={setGlobeSettings}
+      />
       {dimensions.width > 0 && (
         <GlobeGL
           ref={globeRef}
           width={dimensions.width}
           height={dimensions.height}
-          globeImageUrl="https://unpkg.com/three-globe/example/img/earth-night.jpg"
-          backgroundImageUrl="https://unpkg.com/three-globe/example/img/night-sky.png"
-          animateIn={false}
-          atmosphereColor="#1d9bf0"
-          atmosphereAltitude={0.15}
+          globeImageUrl={resolvedTexture}
+          backgroundImageUrl={resolvedBg.url ?? ""}
+          animateIn={globeSettings.animateIn}
+          showAtmosphere={globeSettings.showAtmosphere}
+          atmosphereColor={resolvedAtmosphereColor}
+          atmosphereAltitude={resolvedAtmosphereAlt}
+          showGraticules={globeSettings.showGraticules}
           htmlElementsData={entityPoints}
           htmlLat="lat"
           htmlLng="lng"
@@ -430,23 +511,23 @@ function GlobeRenderer({
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export function GlobeView(props: GlobeViewProps) {
-  const [isClient, setIsClient] = useState(false)
+export const GlobeView = (props: GlobeViewProps) => {
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true)
-  }, [])
+    setIsClient(true);
+  }, []);
 
   if (!isClient) {
-    return <GlobeLoading />
+    return <GlobeLoading />;
   }
 
   return (
     <Suspense fallback={<GlobeLoading />}>
       <GlobeRenderer {...props} />
     </Suspense>
-  )
-}
+  );
+};

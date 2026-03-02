@@ -1,13 +1,17 @@
-import type { Aircraft } from '@/domain/models'
-import { getAircraftCategoryLabel } from '@/domain/models'
-import styles from './aircraft-table.module.scss'
+import type { Aircraft } from "@/domain/models";
+import { getAircraftCategoryLabel } from "@/domain/models";
+
+import styles from "./aircraft-table.module.scss";
 
 interface AircraftTableProps {
-  aircraft: Aircraft[]
-  isLoading?: boolean
+  aircraft: Aircraft[];
+  isLoading?: boolean;
 }
 
-export function AircraftTable({ aircraft, isLoading = false }: AircraftTableProps) {
+export const AircraftTable = ({
+  aircraft,
+  isLoading = false,
+}: AircraftTableProps) => {
   if (isLoading) {
     return (
       <div className={styles.container}>
@@ -15,7 +19,7 @@ export function AircraftTable({ aircraft, isLoading = false }: AircraftTableProp
           <div className={styles.spinner} />
         </div>
       </div>
-    )
+    );
   }
 
   if (aircraft.length === 0) {
@@ -23,7 +27,7 @@ export function AircraftTable({ aircraft, isLoading = false }: AircraftTableProp
       <div className={styles.container}>
         <div className={styles.empty}>No aircraft data available.</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -43,15 +47,21 @@ export function AircraftTable({ aircraft, isLoading = false }: AircraftTableProp
           <tbody>
             {aircraft.map((ac) => (
               <tr key={ac.id}>
-                <td className={styles.callsign}>{ac.callsign ?? 'N/A'}</td>
+                <td className={styles.callsign}>{ac.callsign ?? "N/A"}</td>
                 <td className={styles.mono}>{ac.icao24}</td>
                 <td>{ac.originCountry}</td>
                 <td>
-                  <span className={`${styles.badge} ${styles[`badge${ac.category}`]}`}>
+                  <span
+                    className={`${styles.badge} ${styles[`badge${ac.category}`]}`}
+                  >
                     {getAircraftCategoryLabel(ac.category)}
                   </span>
                 </td>
-                <td>{ac.altitude != null ? `${ac.altitude.toLocaleString()} ft` : 'N/A'}</td>
+                <td>
+                  {ac.altitude != null
+                    ? `${ac.altitude.toLocaleString()} ft`
+                    : "N/A"}
+                </td>
                 <td className={styles.time}>
                   {new Date(ac.lastSeen).toLocaleTimeString()}
                 </td>
@@ -61,5 +71,5 @@ export function AircraftTable({ aircraft, isLoading = false }: AircraftTableProp
         </table>
       </div>
     </div>
-  )
-}
+  );
+};

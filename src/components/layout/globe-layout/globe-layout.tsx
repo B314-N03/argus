@@ -1,98 +1,134 @@
-import { type ReactNode, useCallback, useRef, useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  type ReactNode,
+  useCallback,
+  useRef,
+  useEffect,
+  useState,
+} from "react";
+
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import {
   useSettings,
   SETTINGS_KEYS,
   DEFAULT_SIDEBAR_STATE,
-} from '@/lib/settings'
-import type { SidebarState } from '@/lib/settings'
-import styles from './globe-layout.module.scss'
+} from "@/lib/settings";
+import type { SidebarState } from "@/lib/settings";
 
-const MIN_WIDTH = 200
-const MAX_WIDTH = 480
-const AUTO_COLLAPSE_THRESHOLD = 230
+import styles from "./globe-layout.module.scss";
+
+const MIN_WIDTH = 200;
+const MAX_WIDTH = 480;
+const AUTO_COLLAPSE_THRESHOLD = 230;
 
 interface GlobeLayoutProps {
-  header: ReactNode
-  left: ReactNode
-  center: ReactNode
-  right: ReactNode
+  header: ReactNode;
+  left: ReactNode;
+  center: ReactNode;
+  right: ReactNode;
 }
 
-export function GlobeLayout({ header, left, center, right }: GlobeLayoutProps) {
+export const GlobeLayout = ({
+  header,
+  left,
+  center,
+  right,
+}: GlobeLayoutProps) => {
   const [sidebarState, setSidebarState] = useSettings<SidebarState>(
     SETTINGS_KEYS.SIDEBAR_STATE,
     DEFAULT_SIDEBAR_STATE,
-  )
+  );
 
-  const stateRef = useRef(sidebarState)
+  const stateRef = useRef(sidebarState);
+
   useEffect(() => {
-    stateRef.current = sidebarState
-  }, [sidebarState])
+    stateRef.current = sidebarState;
+  }, [sidebarState]);
 
-  const [dragWidth, setDragWidth] = useState<{ side: 'left' | 'right'; width: number } | null>(null)
-  const dragWidthRef = useRef(dragWidth)
+  const [dragWidth, setDragWidth] = useState<{
+    side: "left" | "right";
+    width: number;
+  } | null>(null);
+  const dragWidthRef = useRef(dragWidth);
+
   useEffect(() => {
-    dragWidthRef.current = dragWidth
-  }, [dragWidth])
+    dragWidthRef.current = dragWidth;
+  }, [dragWidth]);
 
-  const startXRef = useRef(0)
-  const startWidthRef = useRef(0)
-  const draggingSideRef = useRef<'left' | 'right' | null>(null)
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
+  const draggingSideRef = useRef<"left" | "right" | null>(null);
 
   const handlePointerDown = useCallback(
-    (side: 'left' | 'right', e: React.PointerEvent) => {
-      e.preventDefault()
-      draggingSideRef.current = side
-      startXRef.current = e.clientX
-      startWidthRef.current = side === 'left' ? stateRef.current.leftWidth : stateRef.current.rightWidth
+    (side: "left" | "right", e: React.PointerEvent) => {
+      e.preventDefault();
+      draggingSideRef.current = side;
+      startXRef.current = e.clientX;
+      startWidthRef.current =
+        side === "left"
+          ? stateRef.current.leftWidth
+          : stateRef.current.rightWidth;
 
       const handlePointerMove = (moveEvent: PointerEvent) => {
-        const dx = moveEvent.clientX - startXRef.current
-        const delta = draggingSideRef.current === 'left' ? dx : -dx
-        const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidthRef.current + delta))
+        const dx = moveEvent.clientX - startXRef.current;
+        const delta = draggingSideRef.current === "left" ? dx : -dx;
+        const newWidth = Math.min(
+          MAX_WIDTH,
+          Math.max(MIN_WIDTH, startWidthRef.current + delta),
+        );
 
-        setDragWidth({ side: draggingSideRef.current!, width: newWidth })
-      }
+        setDragWidth({ side: draggingSideRef.current!, width: newWidth });
+      };
 
       const handlePointerUp = () => {
-        const current = dragWidthRef.current
+        const current = dragWidthRef.current;
+
         if (draggingSideRef.current && current) {
           if (current.width <= AUTO_COLLAPSE_THRESHOLD) {
-            const collapseKey = draggingSideRef.current === 'left' ? 'leftCollapsed' : 'rightCollapsed'
-            setSidebarState({ ...stateRef.current, [collapseKey]: true })
+            const collapseKey =
+              draggingSideRef.current === "left"
+                ? "leftCollapsed"
+                : "rightCollapsed";
+
+            setSidebarState({ ...stateRef.current, [collapseKey]: true });
           } else {
-            const widthKey = draggingSideRef.current === 'left' ? 'leftWidth' : 'rightWidth'
-            setSidebarState({ ...stateRef.current, [widthKey]: current.width })
+            const widthKey =
+              draggingSideRef.current === "left" ? "leftWidth" : "rightWidth";
+
+            setSidebarState({ ...stateRef.current, [widthKey]: current.width });
           }
         }
-        setDragWidth(null)
-        draggingSideRef.current = null
-        document.removeEventListener('pointermove', handlePointerMove)
-        document.removeEventListener('pointerup', handlePointerUp)
-        document.body.style.cursor = ''
-        document.body.style.userSelect = ''
-      }
 
-      document.body.style.cursor = 'col-resize'
-      document.body.style.userSelect = 'none'
-      document.addEventListener('pointermove', handlePointerMove)
-      document.addEventListener('pointerup', handlePointerUp)
+        setDragWidth(null);
+        draggingSideRef.current = null;
+        document.removeEventListener("pointermove", handlePointerMove);
+        document.removeEventListener("pointerup", handlePointerUp);
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+      };
+
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
+      document.addEventListener("pointermove", handlePointerMove);
+      document.addEventListener("pointerup", handlePointerUp);
     },
     [setSidebarState],
-  )
+  );
 
   const toggleCollapse = useCallback(
-    (side: 'left' | 'right') => {
-      const key = side === 'left' ? 'leftCollapsed' : 'rightCollapsed'
-      setSidebarState({ ...stateRef.current, [key]: !stateRef.current[key] })
+    (side: "left" | "right") => {
+      const key = side === "left" ? "leftCollapsed" : "rightCollapsed";
+
+      setSidebarState({ ...stateRef.current, [key]: !stateRef.current[key] });
     },
     [setSidebarState],
-  )
+  );
 
-  const { leftCollapsed, rightCollapsed, leftWidth, rightWidth } = sidebarState
-  const effectiveLeftWidth = dragWidth?.side === 'left' ? dragWidth.width : leftWidth
-  const effectiveRightWidth = dragWidth?.side === 'right' ? dragWidth.width : rightWidth
+  const { leftCollapsed, rightCollapsed, leftWidth, rightWidth } = sidebarState;
+  const effectiveLeftWidth =
+    dragWidth?.side === "left" ? dragWidth.width : leftWidth;
+  const effectiveRightWidth =
+    dragWidth?.side === "right" ? dragWidth.width : rightWidth;
 
   return (
     <div className={styles.layout}>
@@ -102,8 +138,9 @@ export function GlobeLayout({ header, left, center, right }: GlobeLayoutProps) {
         {leftCollapsed ? (
           <div className={styles.expandStrip} style={{ order: 0 }}>
             <button
+              type="button"
               className={styles.expandButton}
-              onClick={() => toggleCollapse('left')}
+              onClick={() => toggleCollapse("left")}
               aria-label="Expand left panel"
             >
               <ChevronRight size={14} />
@@ -123,11 +160,15 @@ export function GlobeLayout({ header, left, center, right }: GlobeLayoutProps) {
           <div
             className={styles.dragHandle}
             style={{ order: 1 }}
-            onPointerDown={(e) => handlePointerDown('left', e)}
+            onPointerDown={(e) => handlePointerDown("left", e)}
           >
             <button
+              type="button"
               className={styles.collapseButton}
-              onClick={(e) => { e.stopPropagation(); toggleCollapse('left') }}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleCollapse("left");
+              }}
               onPointerDown={(e) => e.stopPropagation()}
               aria-label="Collapse left panel"
             >
@@ -144,11 +185,15 @@ export function GlobeLayout({ header, left, center, right }: GlobeLayoutProps) {
           <div
             className={styles.dragHandle}
             style={{ order: 3 }}
-            onPointerDown={(e) => handlePointerDown('right', e)}
+            onPointerDown={(e) => handlePointerDown("right", e)}
           >
             <button
+              type="button"
               className={styles.collapseButton}
-              onClick={(e) => { e.stopPropagation(); toggleCollapse('right') }}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleCollapse("right");
+              }}
               onPointerDown={(e) => e.stopPropagation()}
               aria-label="Collapse right panel"
             >
@@ -161,8 +206,9 @@ export function GlobeLayout({ header, left, center, right }: GlobeLayoutProps) {
         {rightCollapsed ? (
           <div className={styles.expandStrip} style={{ order: 4 }}>
             <button
+              type="button"
               className={styles.expandButton}
-              onClick={() => toggleCollapse('right')}
+              onClick={() => toggleCollapse("right")}
               aria-label="Expand right panel"
             >
               <ChevronLeft size={14} />
@@ -178,5 +224,5 @@ export function GlobeLayout({ header, left, center, right }: GlobeLayoutProps) {
         )}
       </div>
     </div>
-  )
-}
+  );
+};

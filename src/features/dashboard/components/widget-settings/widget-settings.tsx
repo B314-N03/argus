@@ -1,26 +1,32 @@
-import clsx from 'clsx'
-import type { WidgetVisibility } from '@/lib/settings'
-import styles from './widget-settings.module.scss'
+import clsx from "clsx";
+
+import type { WidgetVisibility } from "@/lib/settings";
+
+import styles from "./widget-settings.module.scss";
 
 interface WidgetSettingsProps {
-  visibility: WidgetVisibility
-  onChange: (visibility: WidgetVisibility) => void
-  onClose: () => void
+  visibility: WidgetVisibility;
+  onChange: (visibility: WidgetVisibility) => void;
+  onClose: () => void;
 }
 
 const WIDGET_LABELS: { key: keyof WidgetVisibility; label: string }[] = [
-  { key: 'radios', label: 'Radio Stations' },
-  { key: 'indicators', label: 'Indicator Status' },
-  { key: 'aircraft', label: 'Aircraft' },
-  { key: 'vessels', label: 'Vessels' },
-  { key: 'signals', label: 'Signals' },
-  { key: 'chokepoints', label: 'Chokepoints' },
-  { key: 'forceSummary', label: 'Force Disposition' },
-]
+  { key: "radios", label: "Radio Stations" },
+  { key: "indicators", label: "Indicator Status" },
+  { key: "aircraft", label: "Aircraft" },
+  { key: "vessels", label: "Vessels" },
+  { key: "signals", label: "Signals" },
+  { key: "chokepoints", label: "Chokepoints" },
+  { key: "forceSummary", label: "Force Disposition" },
+];
 
-export function WidgetSettings({ visibility, onChange, onClose }: WidgetSettingsProps) {
+export const WidgetSettings = ({
+  visibility,
+  onChange,
+  onClose,
+}: WidgetSettingsProps) => {
   function toggle(key: keyof WidgetVisibility) {
-    onChange({ ...visibility, [key]: !visibility[key] })
+    onChange({ ...visibility, [key]: !visibility[key] });
   }
 
   return (
@@ -33,7 +39,11 @@ export function WidgetSettings({ visibility, onChange, onClose }: WidgetSettings
             <div key={key} className={styles.item}>
               <span className={styles.label}>{label}</span>
               <button
-                className={clsx(styles.toggle, visibility[key] && styles.toggleActive)}
+                type="button"
+                className={clsx(
+                  styles.toggle,
+                  visibility[key] && styles.toggleActive,
+                )}
                 onClick={() => toggle(key)}
                 aria-label={`Toggle ${label}`}
               />
@@ -42,5 +52,5 @@ export function WidgetSettings({ visibility, onChange, onClose }: WidgetSettings
         </div>
       </div>
     </>
-  )
-}
+  );
+};

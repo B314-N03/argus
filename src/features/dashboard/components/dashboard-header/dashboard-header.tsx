@@ -1,18 +1,23 @@
-import { useState, useEffect } from 'react'
-import styles from './dashboard-header.module.scss'
+import { useState, useEffect } from "react";
+
+import styles from "./dashboard-header.module.scss";
 
 interface DashboardHeaderProps {
-  activeRegions: number
-  totalEntities: number
+  activeRegions: number;
+  totalEntities: number;
 }
 
-export function DashboardHeader({ activeRegions, totalEntities }: DashboardHeaderProps) {
-  const [utcTime, setUtcTime] = useState(getUTC())
+export const DashboardHeader = ({
+  activeRegions,
+  totalEntities,
+}: DashboardHeaderProps) => {
+  const [utcTime, setUtcTime] = useState(getUTC());
 
   useEffect(() => {
-    const interval = setInterval(() => setUtcTime(getUTC()), 1000)
-    return () => clearInterval(interval)
-  }, [])
+    const interval = setInterval(() => setUtcTime(getUTC()), 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className={styles.header}>
@@ -37,10 +42,11 @@ export function DashboardHeader({ activeRegions, totalEntities }: DashboardHeade
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 function getUTC(): string {
-  const now = new Date()
-  return now.toISOString().slice(11, 19)
+  const now = new Date();
+
+  return now.toISOString().slice(11, 19);
 }

@@ -1,21 +1,25 @@
-import { useMemo } from 'react'
-import { useAircraft } from '@/features/air'
-import { useRadios } from '@/features/radios'
-import { useIndicators } from '@/features/indicators'
-import type { TimeWindow } from '@/domain/models'
-import { mockZones } from '@/lib/api/mock/zones'
-import { generateMockVesselsList } from '@/lib/api/mock/vessels'
-import { generateMockSignalsList } from '@/lib/api/mock/signals'
-import { useCountryGeoJSON } from './use-country-geojson'
+import { useMemo } from "react";
+
+import type { TimeWindow } from "@/domain/models";
+import { useAircraft } from "@/features/air";
+import { useIndicators } from "@/features/indicators";
+import { useRadios } from "@/features/radios";
+import { generateMockSignalsList } from "@/lib/api/mock/signals";
+import { generateMockVesselsList } from "@/lib/api/mock/vessels";
+import { mockZones } from "@/lib/api/mock/zones";
+
+import { useCountryGeoJSON } from "./use-country-geojson";
 
 export function useGlobeData() {
-  const { data: aircraftData } = useAircraft({ limit: 30 })
-  const { data: radiosData } = useRadios()
-  const { data: indicatorsData } = useIndicators({ timeWindow: '24h' as TimeWindow })
-  const { countries } = useCountryGeoJSON()
+  const { data: aircraftData } = useAircraft({ limit: 30 });
+  const { data: radiosData } = useRadios();
+  const { data: indicatorsData } = useIndicators({
+    timeWindow: "24h" as TimeWindow,
+  });
+  const { countries } = useCountryGeoJSON();
 
-  const vessels = useMemo(() => generateMockVesselsList(20), [])
-  const signals = useMemo(() => generateMockSignalsList(25), [])
+  const vessels = useMemo(() => generateMockVesselsList(20), []);
+  const signals = useMemo(() => generateMockSignalsList(25), []);
 
   const aircraftPoints = useMemo(
     () =>
@@ -27,10 +31,10 @@ export function useGlobeData() {
           lng: a.position.longitude,
           label: a.callsign ?? a.icao24,
           category: a.category,
-          type: 'aircraft' as const,
+          type: "aircraft" as const,
         })),
     [aircraftData],
-  )
+  );
 
   const vesselPoints = useMemo(
     () =>
@@ -42,10 +46,10 @@ export function useGlobeData() {
           lng: v.position.longitude,
           label: v.name ?? v.mmsi,
           shipType: v.shipType,
-          type: 'vessel' as const,
+          type: "vessel" as const,
         })),
     [vessels],
-  )
+  );
 
   const signalPoints = useMemo(
     () =>
@@ -57,10 +61,10 @@ export function useGlobeData() {
           lng: s.location!.longitude,
           label: s.source,
           signalType: s.signalType,
-          type: 'signal' as const,
+          type: "signal" as const,
         })),
     [signals],
-  )
+  );
 
   return {
     aircraftPoints,
@@ -72,5 +76,5 @@ export function useGlobeData() {
     radios: radiosData,
     vessels,
     signals,
-  }
+  };
 }

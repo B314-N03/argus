@@ -1,0 +1,27 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.wrapper {
+  position: absolute;
+  bottom: $spacing-4;
+  right: $spacing-4;
+  z-index: $z-dropdown;
+}
+
+.trigger {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+  padding: 0;
+  color: $color-muted-foreground;
+  @include glass-effect;
+
+  &:hover {
+    color: $color-foreground;
+    background: rgba($color-muted, 0.6);
+  }
+}

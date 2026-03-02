@@ -1,21 +1,25 @@
-import { useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { MainLayout } from '@/components/layout/main-layout/main-layout'
-import { Card } from '@/components/ui/card/card'
-import { AircraftTable, AircraftSummary, AssetLookup, useAircraft } from '@/features/air'
-import styles from './air.module.scss'
+import { useState } from "react";
 
-export const Route = createFileRoute('/air')({
-  component: AirPage,
-})
+import { createFileRoute } from "@tanstack/react-router";
 
-type AirTab = 'tracking' | 'assets'
+import { MainLayout } from "@/components/layout/main-layout/main-layout";
+import { Card } from "@/components/ui/card/card";
+import {
+  AircraftTable,
+  AircraftSummary,
+  AssetLookup,
+  useAircraft,
+} from "@/features/air";
 
-function AirPage() {
-  const [activeTab, setActiveTab] = useState<AirTab>('tracking')
-  const { data, isLoading } = useAircraft()
+import styles from "./air.module.scss";
 
-  const aircraft = data?.aircraft ?? []
+type AirTab = "tracking" | "assets";
+
+const AirPage = () => {
+  const [activeTab, setActiveTab] = useState<AirTab>("tracking");
+  const { data, isLoading } = useAircraft();
+
+  const aircraft = data?.aircraft ?? [];
 
   return (
     <MainLayout>
@@ -23,20 +27,22 @@ function AirPage() {
 
       <div className={styles.tabs}>
         <button
-          className={`${styles.tab} ${activeTab === 'tracking' ? styles.tabActive : ''}`}
-          onClick={() => setActiveTab('tracking')}
+          type="button"
+          className={`${styles.tab} ${activeTab === "tracking" ? styles.tabActive : ""}`}
+          onClick={() => setActiveTab("tracking")}
         >
           Live Tracking
         </button>
         <button
-          className={`${styles.tab} ${activeTab === 'assets' ? styles.tabActive : ''}`}
-          onClick={() => setActiveTab('assets')}
+          type="button"
+          className={`${styles.tab} ${activeTab === "assets" ? styles.tabActive : ""}`}
+          onClick={() => setActiveTab("assets")}
         >
           Asset Database
         </button>
       </div>
 
-      {activeTab === 'tracking' && (
+      {activeTab === "tracking" && (
         <>
           <AircraftSummary aircraft={aircraft} isLoading={isLoading} />
           <Card padding="none">
@@ -45,7 +51,11 @@ function AirPage() {
         </>
       )}
 
-      {activeTab === 'assets' && <AssetLookup />}
+      {activeTab === "assets" && <AssetLookup />}
     </MainLayout>
-  )
-}
+  );
+};
+
+export const Route = createFileRoute("/air")({
+  component: AirPage,
+});

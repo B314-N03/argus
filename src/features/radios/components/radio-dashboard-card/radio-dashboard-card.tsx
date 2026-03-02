@@ -1,25 +1,31 @@
-import { Radio } from 'lucide-react'
-import { Card } from '@/components/ui/card/card'
-import { InfoTooltip } from '@/components/ui/info-tooltip/info-tooltip'
-import { tooltipContent } from '@/lib/tooltip-content'
-import { useRadios } from '../../hooks/use-radios'
-import styles from './radio-dashboard-card.module.scss'
+import { Radio } from "lucide-react";
 
-export function RadioDashboardCard() {
-  const { data, isLoading } = useRadios()
+import { Card } from "@/components/ui/card/card";
+import { InfoTooltip } from "@/components/ui/info-tooltip/info-tooltip";
+import { tooltipContent } from "@/lib/tooltip-content";
+
+import { useRadios } from "../../hooks/use-radios";
+
+import styles from "./radio-dashboard-card.module.scss";
+
+export const RadioDashboardCard = () => {
+  const { data, isLoading } = useRadios();
 
   if (isLoading || !data) {
     return (
       <Card padding="sm">
         <div className={styles.loading}>Loading radios...</div>
       </Card>
-    )
+    );
   }
 
-  const { summary, stations } = data
+  const { summary, stations } = data;
   const mostRecent = [...stations]
-    .filter((s) => s.status !== 'inactive')
-    .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())[0]
+    .filter((s) => s.status !== "inactive")
+    .sort(
+      (a, b) =>
+        new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime(),
+    )[0];
 
   return (
     <Card padding="sm">
@@ -34,7 +40,9 @@ export function RadioDashboardCard() {
           <span className={styles.statLabel}>Monitored</span>
         </div>
         <div className={styles.stat}>
-          <span className={`${styles.statValue} ${styles.active}`}>{summary.active}</span>
+          <span className={`${styles.statValue} ${styles.active}`}>
+            {summary.active}
+          </span>
           <span className={styles.statLabel}>Active</span>
         </div>
         <div className={styles.stat}>
@@ -49,5 +57,5 @@ export function RadioDashboardCard() {
         </div>
       )}
     </Card>
-  )
-}
+  );
+};

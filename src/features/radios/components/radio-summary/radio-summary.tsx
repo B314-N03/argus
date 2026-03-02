@@ -1,17 +1,19 @@
-import { Radio, Activity } from 'lucide-react'
-import type { RadioSummary as RadioSummaryType } from '@/domain/models'
-import { StatCard } from '@/components/ui/stat-card/stat-card'
-import { tooltipContent } from '@/lib/tooltip-content'
-import styles from './radio-summary.module.scss'
+import { Radio, Activity } from "lucide-react";
+
+import { StatCard } from "@/components/ui/stat-card/stat-card";
+import type { RadioSummary as RadioSummaryType } from "@/domain/models";
+import { tooltipContent } from "@/lib/tooltip-content";
+
+import styles from "./radio-summary.module.scss";
 
 interface RadioSummaryProps {
-  summary: RadioSummaryType | undefined
-  isLoading: boolean
+  summary: RadioSummaryType | undefined;
+  isLoading: boolean;
 }
 
-export function RadioSummary({ summary, isLoading }: RadioSummaryProps) {
+export const RadioSummary = ({ summary, isLoading }: RadioSummaryProps) => {
   if (isLoading || !summary) {
-    return <div className={styles.loading}>Loading summary...</div>
+    return <div className={styles.loading}>Loading summary...</div>;
   }
 
   return (
@@ -33,10 +35,10 @@ export function RadioSummary({ summary, isLoading }: RadioSummaryProps) {
       <StatCard
         label="Avg Activity"
         value={`${summary.averageActivity}%`}
-        trend={summary.averageActivity > 50 ? 'up' : 'neutral'}
+        trend={summary.averageActivity > 50 ? "up" : "neutral"}
         tooltip={tooltipContent.radio_activity}
         description="Average activity level"
       />
     </div>
-  )
-}
+  );
+};

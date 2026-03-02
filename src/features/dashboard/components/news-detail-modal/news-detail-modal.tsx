@@ -1,11 +1,19 @@
-import { Twitter, Newspaper, MessageCircle, Globe, ExternalLink } from 'lucide-react'
-import { Dialog } from '@/components/ui/dialog/dialog'
-import type { NewsItem, NewsSourceType } from '@/domain/models'
-import styles from './news-detail-modal.module.scss'
+import {
+  Twitter,
+  Newspaper,
+  MessageCircle,
+  Globe,
+  ExternalLink,
+} from "lucide-react";
+
+import { Dialog } from "@/components/ui/dialog/dialog";
+import type { NewsItem, NewsSourceType } from "@/domain/models";
+
+import styles from "./news-detail-modal.module.scss";
 
 interface NewsDetailModalProps {
-  item: NewsItem | null
-  onClose: () => void
+  item: NewsItem | null;
+  onClose: () => void;
 }
 
 const sourceIcons: Record<NewsSourceType, typeof Twitter> = {
@@ -13,38 +21,40 @@ const sourceIcons: Record<NewsSourceType, typeof Twitter> = {
   news: Newspaper,
   telegram: MessageCircle,
   forum: Globe,
-}
+};
 
 function formatTimestamp(iso: string): { absolute: string; relative: string } {
-  const date = new Date(iso)
-  const absolute = date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  })
+  const date = new Date(iso);
+  const absolute = date.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
 
-  const diff = Date.now() - date.getTime()
-  const minutes = Math.floor(diff / 60000)
-  let relative: string
-  if (minutes < 1) relative = 'Just now'
-  else if (minutes < 60) relative = `${minutes}m ago`
+  const diff = Date.now() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  let relative: string;
+
+  if (minutes < 1) relative = "Just now";
+  else if (minutes < 60) relative = `${minutes}m ago`;
   else {
-    const hours = Math.floor(minutes / 60)
-    if (hours < 24) relative = `${hours}h ago`
-    else relative = `${Math.floor(hours / 24)}d ago`
+    const hours = Math.floor(minutes / 60);
+
+    if (hours < 24) relative = `${hours}h ago`;
+    else relative = `${Math.floor(hours / 24)}d ago`;
   }
 
-  return { absolute, relative }
+  return { absolute, relative };
 }
 
-export function NewsDetailModal({ item, onClose }: NewsDetailModalProps) {
-  if (!item) return null
+export const NewsDetailModal = ({ item, onClose }: NewsDetailModalProps) => {
+  if (!item) return null;
 
-  const Icon = sourceIcons[item.sourceType]
-  const { absolute, relative } = formatTimestamp(item.timestamp)
+  const Icon = sourceIcons[item.sourceType];
+  const { absolute, relative } = formatTimestamp(item.timestamp);
 
   return (
     <Dialog open={!!item} onClose={onClose} title="OSINT Report" size="md">
@@ -53,7 +63,9 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps) {
           <Icon size={18} className={styles.sourceIcon} />
           <div className={styles.sourceInfo}>
             <span className={styles.sourceName}>{item.source}</span>
-            {item.author && <span className={styles.sourceAuthor}>{item.author}</span>}
+            {item.author && (
+              <span className={styles.sourceAuthor}>{item.author}</span>
+            )}
           </div>
         </div>
 
@@ -64,7 +76,9 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps) {
             {absolute} ({relative})
           </span>
           {item.region && (
-            <span className={styles.regionBadge}>{item.region.replace(/_/g, ' ')}</span>
+            <span className={styles.regionBadge}>
+              {item.region.replace(/_/g, " ")}
+            </span>
           )}
         </div>
 
@@ -72,7 +86,7 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps) {
           <div className={styles.tags}>
             {item.tags.map((tag) => (
               <span key={tag} className={styles.tag}>
-                {tag.replace(/_/g, ' ')}
+                {tag.replace(/_/g, " ")}
               </span>
             ))}
           </div>
@@ -91,5 +105,5 @@ export function NewsDetailModal({ item, onClose }: NewsDetailModalProps) {
         )}
       </div>
     </Dialog>
-  )
-}
+  );
+};

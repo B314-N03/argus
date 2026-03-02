@@ -1,12 +1,13 @@
-import type { SignalPattern } from '@/domain/models'
-import styles from './signal-waveform.module.scss'
+import type { SignalPattern } from "@/domain/models";
+
+import styles from "./signal-waveform.module.scss";
 
 interface SignalWaveformProps {
-  pattern: SignalPattern
-  isActive: boolean
+  pattern: SignalPattern;
+  isActive: boolean;
 }
 
-const BAR_COUNT = 12
+const BAR_COUNT = 12;
 
 function getPatternClass(pattern: SignalPattern, s: typeof styles): string {
   const map: Record<SignalPattern, string> = {
@@ -16,13 +17,14 @@ function getPatternClass(pattern: SignalPattern, s: typeof styles): string {
     numbers: s.numbers,
     morse: s.morse,
     silence: s.silence,
-  }
-  return map[pattern]
+  };
+
+  return map[pattern];
 }
 
-export function SignalWaveform({ pattern, isActive }: SignalWaveformProps) {
-  const patternClass = getPatternClass(pattern, styles)
-  const activeClass = isActive ? styles.active : ''
+export const SignalWaveform = ({ pattern, isActive }: SignalWaveformProps) => {
+  const patternClass = getPatternClass(pattern, styles);
+  const activeClass = isActive ? styles.active : "";
 
   return (
     <svg
@@ -43,5 +45,5 @@ export function SignalWaveform({ pattern, isActive }: SignalWaveformProps) {
         />
       ))}
     </svg>
-  )
-}
+  );
+};

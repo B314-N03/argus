@@ -1,26 +1,28 @@
-import { Navigation } from 'lucide-react'
-import { Card } from '@/components/ui/card/card'
-import { InfoTooltip } from '@/components/ui/info-tooltip/info-tooltip'
-import { mockChokepoints } from '@/lib/api/mock/chokepoints'
-import type { Chokepoint } from '@/domain/models'
-import clsx from 'clsx'
-import styles from './chokepoint-widget.module.scss'
+import clsx from "clsx";
+import { Navigation } from "lucide-react";
 
-const riskStyles: Record<Chokepoint['riskLevel'], string> = {
+import { Card } from "@/components/ui/card/card";
+import { InfoTooltip } from "@/components/ui/info-tooltip/info-tooltip";
+import type { Chokepoint } from "@/domain/models";
+import { mockChokepoints } from "@/lib/api/mock/chokepoints";
+
+import styles from "./chokepoint-widget.module.scss";
+
+const riskStyles: Record<Chokepoint["riskLevel"], string> = {
   low: styles.riskLow,
   moderate: styles.riskModerate,
   elevated: styles.riskElevated,
   high: styles.riskHigh,
-}
+};
 
-const riskBarColors: Record<Chokepoint['riskLevel'], string> = {
-  low: '#18b76f',
-  moderate: '#f4900c',
-  elevated: '#f4900c',
-  high: '#f4212e',
-}
+const riskBarColors: Record<Chokepoint["riskLevel"], string> = {
+  low: "#18b76f",
+  moderate: "#f4900c",
+  elevated: "#f4900c",
+  high: "#f4212e",
+};
 
-export function ChokepointWidget() {
+export const ChokepointWidget = () => {
   return (
     <Card padding="sm">
       <div className={styles.widget}>
@@ -31,12 +33,15 @@ export function ChokepointWidget() {
         </div>
         <div className={styles.list}>
           {mockChokepoints.map((cp) => {
-            const ratio = Math.min(cp.currentVessels / cp.dailyTransits, 1)
+            const ratio = Math.min(cp.currentVessels / cp.dailyTransits, 1);
+
             return (
               <div key={cp.id} className={styles.item}>
                 <div className={styles.itemHeader}>
                   <span className={styles.name}>{cp.name}</span>
-                  <span className={clsx(styles.riskBadge, riskStyles[cp.riskLevel])}>
+                  <span
+                    className={clsx(styles.riskBadge, riskStyles[cp.riskLevel])}
+                  >
                     {cp.riskLevel}
                   </span>
                 </div>
@@ -58,10 +63,10 @@ export function ChokepointWidget() {
                   />
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </Card>
-  )
-}
+  );
+};

@@ -1,25 +1,32 @@
-import { Shield } from 'lucide-react'
-import { Card } from '@/components/ui/card/card'
-import { InfoTooltip } from '@/components/ui/info-tooltip/info-tooltip'
-import type { GlobePoint } from '../globe-view/globe-view'
-import styles from './force-summary.module.scss'
+import { Shield } from "lucide-react";
+
+import { Card } from "@/components/ui/card/card";
+import { InfoTooltip } from "@/components/ui/info-tooltip/info-tooltip";
+
+import type { GlobePoint } from "../globe-view/globe-view";
+
+import styles from "./force-summary.module.scss";
 
 interface ForceSummaryProps {
-  aircraftPoints: GlobePoint[]
-  vesselPoints: GlobePoint[]
-  signalCount: number
+  aircraftPoints: GlobePoint[];
+  vesselPoints: GlobePoint[];
+  signalCount: number;
 }
 
-export function ForceSummary({ aircraftPoints, vesselPoints, signalCount }: ForceSummaryProps) {
+export const ForceSummary = ({
+  aircraftPoints,
+  vesselPoints,
+  signalCount,
+}: ForceSummaryProps) => {
   const militaryAircraft = aircraftPoints.filter(
-    (p) => p.category === 'military' || p.category === 'government',
-  ).length
-  const civilianAircraft = aircraftPoints.length - militaryAircraft
+    (p) => p.category === "military" || p.category === "government",
+  ).length;
+  const civilianAircraft = aircraftPoints.length - militaryAircraft;
 
   const militaryVessels = vesselPoints.filter(
-    (p) => p.shipType === 'military' || p.shipType === 'coast guard',
-  ).length
-  const civilianVessels = vesselPoints.length - militaryVessels
+    (p) => p.shipType === "military" || p.shipType === "coast guard",
+  ).length;
+  const civilianVessels = vesselPoints.length - militaryVessels;
 
   return (
     <Card padding="sm">
@@ -36,14 +43,20 @@ export function ForceSummary({ aircraftPoints, vesselPoints, signalCount }: Forc
             <div className={styles.rows}>
               <div className={styles.row}>
                 <span className={styles.label}>
-                  <span className={styles.dot} style={{ backgroundColor: '#1d9bf0' }} />
+                  <span
+                    className={styles.dot}
+                    style={{ backgroundColor: "#1d9bf0" }}
+                  />
                   Military / Gov
                 </span>
                 <span className={styles.value}>{militaryAircraft}</span>
               </div>
               <div className={styles.row}>
                 <span className={styles.label}>
-                  <span className={styles.dot} style={{ backgroundColor: '#71767b' }} />
+                  <span
+                    className={styles.dot}
+                    style={{ backgroundColor: "#71767b" }}
+                  />
                   Civilian
                 </span>
                 <span className={styles.value}>{civilianAircraft}</span>
@@ -58,14 +71,20 @@ export function ForceSummary({ aircraftPoints, vesselPoints, signalCount }: Forc
             <div className={styles.rows}>
               <div className={styles.row}>
                 <span className={styles.label}>
-                  <span className={styles.dot} style={{ backgroundColor: '#1d9bf0' }} />
+                  <span
+                    className={styles.dot}
+                    style={{ backgroundColor: "#1d9bf0" }}
+                  />
                   Military / CG
                 </span>
                 <span className={styles.value}>{militaryVessels}</span>
               </div>
               <div className={styles.row}>
                 <span className={styles.label}>
-                  <span className={styles.dot} style={{ backgroundColor: '#18b76f' }} />
+                  <span
+                    className={styles.dot}
+                    style={{ backgroundColor: "#18b76f" }}
+                  />
                   Civilian
                 </span>
                 <span className={styles.value}>{civilianVessels}</span>
@@ -80,7 +99,10 @@ export function ForceSummary({ aircraftPoints, vesselPoints, signalCount }: Forc
             <div className={styles.rows}>
               <div className={styles.totalRow}>
                 <span className={styles.label}>
-                  <span className={styles.dot} style={{ backgroundColor: '#f4900c' }} />
+                  <span
+                    className={styles.dot}
+                    style={{ backgroundColor: "#f4900c" }}
+                  />
                   Total Captured
                 </span>
                 <span className={styles.value}>{signalCount}</span>
@@ -90,5 +112,5 @@ export function ForceSummary({ aircraftPoints, vesselPoints, signalCount }: Forc
         </div>
       </div>
     </Card>
-  )
-}
+  );
+};

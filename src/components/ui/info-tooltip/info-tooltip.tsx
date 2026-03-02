@@ -1,28 +1,34 @@
-import { useState, useRef, useEffect } from 'react'
-import styles from './info-tooltip.module.scss'
+import { useState, useRef, useEffect } from "react";
+
+import styles from "./info-tooltip.module.scss";
 
 interface InfoTooltipProps {
-  content: string
+  content: string;
 }
 
-export function InfoTooltip({ content }: InfoTooltipProps) {
-  const [visible, setVisible] = useState(false)
-  const [coords, setCoords] = useState<{ top: number; left: number; placement: 'top' | 'bottom' } | null>(null)
-  const triggerRef = useRef<HTMLButtonElement>(null)
+export const InfoTooltip = ({ content }: InfoTooltipProps) => {
+  const [visible, setVisible] = useState(false);
+  const [coords, setCoords] = useState<{
+    top: number;
+    left: number;
+    placement: "top" | "bottom";
+  } | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (visible && triggerRef.current) {
-      const rect = triggerRef.current.getBoundingClientRect()
-      const placement = rect.top < 120 ? 'bottom' : 'top'
+      const rect = triggerRef.current.getBoundingClientRect();
+      const placement = rect.top < 120 ? "bottom" : "top";
+
       setCoords({
         left: rect.left + rect.width / 2,
-        top: placement === 'top' ? rect.top - 6 : rect.bottom + 6,
+        top: placement === "top" ? rect.top - 6 : rect.bottom + 6,
         placement,
-      })
+      });
     } else {
-      setCoords(null)
+      setCoords(null);
     }
-  }, [visible])
+  }, [visible]);
 
   return (
     <span className={styles.wrapper}>
@@ -43,7 +49,7 @@ export function InfoTooltip({ content }: InfoTooltipProps) {
           className={`${styles.tooltip} ${styles[coords.placement]}`}
           role="tooltip"
           style={{
-            position: 'fixed',
+            position: "fixed",
             left: coords.left,
             top: coords.top,
           }}
@@ -52,5 +58,5 @@ export function InfoTooltip({ content }: InfoTooltipProps) {
         </span>
       )}
     </span>
-  )
-}
+  );
+};

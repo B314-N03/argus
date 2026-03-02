@@ -1,26 +1,31 @@
-import { Dialog } from '@/components/ui/dialog/dialog'
-import type { Country } from '@/domain/models'
-import type { NewsItem } from '@/domain/models'
-import styles from './country-modal.module.scss'
+import { Dialog } from "@/components/ui/dialog/dialog";
+import type { Country, NewsItem } from "@/domain/models";
+
+import styles from "./country-modal.module.scss";
 
 interface CountryModalProps {
-  country: Country | null
-  newsItems: NewsItem[]
-  onClose: () => void
+  country: Country | null;
+  newsItems: NewsItem[];
+  onClose: () => void;
 }
 
 function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`
-  return n.toString()
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+
+  return n.toString();
 }
 
-export function CountryModal({ country, newsItems, onClose }: CountryModalProps) {
-  if (!country) return null
+export const CountryModal = ({
+  country,
+  newsItems,
+  onClose,
+}: CountryModalProps) => {
+  if (!country) return null;
 
   const filteredNews = newsItems.filter(
     (item) => item.region && country.region && item.region === country.region,
-  )
+  );
 
   return (
     <Dialog open={!!country} onClose={onClose} title={country.name} size="lg">
@@ -30,21 +35,27 @@ export function CountryModal({ country, newsItems, onClose }: CountryModalProps)
           <div className={styles.grid}>
             <div className={styles.field}>
               <span className={styles.fieldLabel}>Capital</span>
-              <span className={styles.fieldValue}>{country.capital ?? '—'}</span>
+              <span className={styles.fieldValue}>
+                {country.capital ?? "—"}
+              </span>
             </div>
             <div className={styles.field}>
               <span className={styles.fieldLabel}>Population</span>
               <span className={styles.fieldValue}>
-                {country.population ? formatNumber(country.population) : '—'}
+                {country.population ? formatNumber(country.population) : "—"}
               </span>
             </div>
             <div className={styles.field}>
               <span className={styles.fieldLabel}>Government Type</span>
-              <span className={styles.fieldValue}>{country.governmentType}</span>
+              <span className={styles.fieldValue}>
+                {country.governmentType}
+              </span>
             </div>
             <div className={styles.field}>
               <span className={styles.fieldLabel}>Region</span>
-              <span className={styles.fieldValue}>{country.region.replace(/_/g, ' ')}</span>
+              <span className={styles.fieldValue}>
+                {country.region.replace(/_/g, " ")}
+              </span>
             </div>
           </div>
         </div>
@@ -58,7 +69,9 @@ export function CountryModal({ country, newsItems, onClose }: CountryModalProps)
             </div>
             <div className={styles.field}>
               <span className={styles.fieldLabel}>Head of Government</span>
-              <span className={styles.fieldValue}>{country.headOfGovernment}</span>
+              <span className={styles.fieldValue}>
+                {country.headOfGovernment}
+              </span>
             </div>
           </div>
         </div>
@@ -69,13 +82,17 @@ export function CountryModal({ country, newsItems, onClose }: CountryModalProps)
             <div className={styles.field}>
               <span className={styles.fieldLabel}>Active Personnel</span>
               <span className={styles.fieldValueLarge}>
-                {country.activePersonnel ? formatNumber(country.activePersonnel) : '—'}
+                {country.activePersonnel
+                  ? formatNumber(country.activePersonnel)
+                  : "—"}
               </span>
             </div>
             <div className={styles.field}>
               <span className={styles.fieldLabel}>Reserve Personnel</span>
               <span className={styles.fieldValueLarge}>
-                {country.reservePersonnel ? formatNumber(country.reservePersonnel) : '—'}
+                {country.reservePersonnel
+                  ? formatNumber(country.reservePersonnel)
+                  : "—"}
               </span>
             </div>
           </div>
@@ -115,10 +132,12 @@ export function CountryModal({ country, newsItems, onClose }: CountryModalProps)
               ))}
             </div>
           ) : (
-            <p className={styles.noData}>No recent regional activity reported.</p>
+            <p className={styles.noData}>
+              No recent regional activity reported.
+            </p>
           )}
         </div>
       </div>
     </Dialog>
-  )
-}
+  );
+};

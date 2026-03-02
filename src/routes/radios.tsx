@@ -1,19 +1,23 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { MainLayout } from '@/components/layout/main-layout/main-layout'
-import { RadioSummary, RadioStationsList, useRadios } from '@/features/radios'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/radios')({
-  component: RadiosPage,
-})
+import { MainLayout } from "@/components/layout/main-layout/main-layout";
+import { RadioSummary, RadioStationsList, useRadios } from "@/features/radios";
 
-function RadiosPage() {
-  const { data, isLoading } = useRadios()
+const RadiosPage = () => {
+  const { data, isLoading } = useRadios();
 
   return (
     <MainLayout>
       <h1>Radio Stations</h1>
       <RadioSummary summary={data?.summary} isLoading={isLoading} />
-      <RadioStationsList stations={data?.stations ?? []} isLoading={isLoading} />
+      <RadioStationsList
+        stations={data?.stations ?? []}
+        isLoading={isLoading}
+      />
     </MainLayout>
-  )
-}
+  );
+};
+
+export const Route = createFileRoute("/radios")({
+  component: RadiosPage,
+});

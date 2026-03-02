@@ -1,40 +1,43 @@
-import type { ReactNode } from 'react'
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import { InfoTooltip } from '@/components/ui/info-tooltip/info-tooltip'
-import styles from './stat-card.module.scss'
+import type { ReactNode } from "react";
+
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+
+import { InfoTooltip } from "@/components/ui/info-tooltip/info-tooltip";
+
+import styles from "./stat-card.module.scss";
 
 interface StatCardProps {
-  label: string
-  value: string | number
-  trend?: 'up' | 'down' | 'neutral'
-  trendValue?: string
-  description?: string
-  icon?: ReactNode
-  tooltip?: string
-  className?: string
+  label: string;
+  value: string | number;
+  trend?: "up" | "down" | "neutral";
+  trendValue?: string;
+  description?: string;
+  icon?: ReactNode;
+  tooltip?: string;
+  className?: string;
 }
 
-export function StatCard({
+export const StatCard = ({
   label,
   value,
-  trend = 'neutral',
+  trend = "neutral",
   trendValue,
   description,
   icon,
   tooltip,
-  className = '',
-}: StatCardProps) {
+  className = "",
+}: StatCardProps) => {
   const trendClass = {
     up: styles.trendUp,
     down: styles.trendDown,
     neutral: styles.trendNeutral,
-  }[trend]
+  }[trend];
 
   const TrendIcon = {
     up: TrendingUp,
     down: TrendingDown,
     neutral: Minus,
-  }[trend]
+  }[trend];
 
   return (
     <div className={`${styles.statCard} ${className}`}>
@@ -46,7 +49,7 @@ export function StatCard({
         {icon && <span className={styles.icon}>{icon}</span>}
       </div>
       <div className={styles.value}>{value}</div>
-      {(trend !== 'neutral' || trendValue) && (
+      {(trend !== "neutral" || trendValue) && (
         <div className={`${styles.trend} ${trendClass}`}>
           <TrendIcon size={16} />
           {trendValue && <span>{trendValue}</span>}
@@ -54,5 +57,5 @@ export function StatCard({
       )}
       {description && <div className={styles.description}>{description}</div>}
     </div>
-  )
-}
+  );
+};

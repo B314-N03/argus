@@ -1,23 +1,30 @@
-import type { SignalEvent } from '@/domain/models'
-import { Card } from '@/components/ui/card/card'
-import styles from './signal-summary.module.scss'
+import { Card } from "@/components/ui/card/card";
+import type { SignalEvent } from "@/domain/models";
+
+import styles from "./signal-summary.module.scss";
 
 interface SignalSummaryProps {
-  signals: SignalEvent[]
-  isLoading?: boolean
+  signals: SignalEvent[];
+  isLoading?: boolean;
 }
 
-export function SignalSummary({ signals, isLoading = false }: SignalSummaryProps) {
+export const SignalSummary = ({
+  signals,
+  isLoading = false,
+}: SignalSummaryProps) => {
   if (isLoading) {
-    return null
+    return null;
   }
 
-  const adsbCount = signals.filter((s) => s.signalType === 'adsb').length
-  const aisCount = signals.filter((s) => s.signalType === 'ais').length
-  const hfCount = signals.filter((s) => s.signalType === 'hf').length
-  const avgStrength = signals.length > 0
-    ? Math.round(signals.reduce((sum, s) => sum + s.strength, 0) / signals.length)
-    : 0
+  const adsbCount = signals.filter((s) => s.signalType === "adsb").length;
+  const aisCount = signals.filter((s) => s.signalType === "ais").length;
+  const hfCount = signals.filter((s) => s.signalType === "hf").length;
+  const avgStrength =
+    signals.length > 0
+      ? Math.round(
+          signals.reduce((sum, s) => sum + s.strength, 0) / signals.length,
+        )
+      : 0;
 
   return (
     <div className={styles.container}>
@@ -30,15 +37,21 @@ export function SignalSummary({ signals, isLoading = false }: SignalSummaryProps
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>ADS-B</span>
-            <span className={`${styles.statValue} ${styles.adsb}`}>{adsbCount}</span>
+            <span className={`${styles.statValue} ${styles.adsb}`}>
+              {adsbCount}
+            </span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>AIS</span>
-            <span className={`${styles.statValue} ${styles.ais}`}>{aisCount}</span>
+            <span className={`${styles.statValue} ${styles.ais}`}>
+              {aisCount}
+            </span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>HF Radio</span>
-            <span className={`${styles.statValue} ${styles.hf}`}>{hfCount}</span>
+            <span className={`${styles.statValue} ${styles.hf}`}>
+              {hfCount}
+            </span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>Avg Strength</span>
@@ -47,5 +60,5 @@ export function SignalSummary({ signals, isLoading = false }: SignalSummaryProps
         </div>
       </Card>
     </div>
-  )
-}
+  );
+};

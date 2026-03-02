@@ -1,16 +1,14 @@
-import { useState } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { MainLayout } from '@/components/layout/main-layout/main-layout'
-import { IndicatorsGrid, useIndicators } from '@/features/indicators'
-import type { TimeWindow } from '@/domain/models'
+import { useState } from "react";
 
-export const Route = createFileRoute('/indicators')({
-  component: IndicatorsPage,
-})
+import { createFileRoute } from "@tanstack/react-router";
 
-function IndicatorsPage() {
-  const [timeWindow, setTimeWindow] = useState<TimeWindow>('24h')
-  const { data, isLoading } = useIndicators({ timeWindow })
+import { MainLayout } from "@/components/layout/main-layout/main-layout";
+import type { TimeWindow } from "@/domain/models";
+import { IndicatorsGrid, useIndicators } from "@/features/indicators";
+
+const IndicatorsPage = () => {
+  const [timeWindow, setTimeWindow] = useState<TimeWindow>("24h");
+  const { data, isLoading } = useIndicators({ timeWindow });
 
   return (
     <MainLayout>
@@ -22,5 +20,9 @@ function IndicatorsPage() {
         onTimeWindowChange={setTimeWindow}
       />
     </MainLayout>
-  )
-}
+  );
+};
+
+export const Route = createFileRoute("/indicators")({
+  component: IndicatorsPage,
+});

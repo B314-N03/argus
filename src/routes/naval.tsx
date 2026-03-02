@@ -1,16 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { MainLayout } from '@/components/layout/main-layout/main-layout'
-import { Card } from '@/components/ui/card/card'
-import { VesselTable, VesselSummary, useVessels } from '@/features/naval'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/naval')({
-  component: NavalPage,
-})
+import { MainLayout } from "@/components/layout/main-layout/main-layout";
+import { Card } from "@/components/ui/card/card";
+import { VesselTable, VesselSummary, useVessels } from "@/features/naval";
 
-function NavalPage() {
-  const { data, isLoading } = useVessels()
+const NavalPage = () => {
+  const { data, isLoading } = useVessels();
 
-  const vessels = data?.vessels ?? []
+  const vessels = data?.vessels ?? [];
 
   return (
     <MainLayout>
@@ -20,5 +17,9 @@ function NavalPage() {
         <VesselTable vessels={vessels} isLoading={isLoading} />
       </Card>
     </MainLayout>
-  )
-}
+  );
+};
+
+export const Route = createFileRoute("/naval")({
+  component: NavalPage,
+});

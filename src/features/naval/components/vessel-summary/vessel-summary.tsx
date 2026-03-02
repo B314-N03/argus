@@ -1,21 +1,25 @@
-import type { Vessel } from '@/domain/models'
-import { Card } from '@/components/ui/card/card'
-import styles from './vessel-summary.module.scss'
+import { Card } from "@/components/ui/card/card";
+import type { Vessel } from "@/domain/models";
+
+import styles from "./vessel-summary.module.scss";
 
 interface VesselSummaryProps {
-  vessels: Vessel[]
-  isLoading?: boolean
+  vessels: Vessel[];
+  isLoading?: boolean;
 }
 
-export function VesselSummary({ vessels, isLoading = false }: VesselSummaryProps) {
+export const VesselSummary = ({
+  vessels,
+  isLoading = false,
+}: VesselSummaryProps) => {
   if (isLoading) {
-    return null
+    return null;
   }
 
-  const militaryCount = vessels.filter((v) => v.shipType === 'military').length
-  const tankerCount = vessels.filter((v) => v.shipType === 'tanker').length
-  const cargoCount = vessels.filter((v) => v.shipType === 'cargo').length
-  const uniqueFlags = new Set(vessels.map((v) => v.flag)).size
+  const militaryCount = vessels.filter((v) => v.shipType === "military").length;
+  const tankerCount = vessels.filter((v) => v.shipType === "tanker").length;
+  const cargoCount = vessels.filter((v) => v.shipType === "cargo").length;
+  const uniqueFlags = new Set(vessels.map((v) => v.flag)).size;
 
   return (
     <div className={styles.container}>
@@ -28,11 +32,15 @@ export function VesselSummary({ vessels, isLoading = false }: VesselSummaryProps
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>Military</span>
-            <span className={`${styles.statValue} ${styles.military}`}>{militaryCount}</span>
+            <span className={`${styles.statValue} ${styles.military}`}>
+              {militaryCount}
+            </span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>Tankers</span>
-            <span className={`${styles.statValue} ${styles.tanker}`}>{tankerCount}</span>
+            <span className={`${styles.statValue} ${styles.tanker}`}>
+              {tankerCount}
+            </span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statLabel}>Cargo</span>
@@ -45,5 +53,5 @@ export function VesselSummary({ vessels, isLoading = false }: VesselSummaryProps
         </div>
       </Card>
     </div>
-  )
-}
+  );
+};

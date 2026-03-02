@@ -1,11 +1,12 @@
-import type { AircraftAsset } from '@/domain/models'
-import styles from './asset-card.module.scss'
+import type { AircraftAsset } from "@/domain/models";
+
+import styles from "./asset-card.module.scss";
 
 interface AssetCardProps {
-  asset: AircraftAsset
+  asset: AircraftAsset;
 }
 
-export function AssetCard({ asset }: AssetCardProps) {
+export const AssetCard = ({ asset }: AssetCardProps) => {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
@@ -47,5 +48,5 @@ export function AssetCard({ asset }: AssetCardProps) {
         <span className={styles.country}>{asset.country}</span>
       </div>
     </div>
-  )
-}
+  );
+};

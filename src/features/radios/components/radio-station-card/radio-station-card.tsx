@@ -1,26 +1,31 @@
-import { useState } from 'react'
-import { Headphones } from 'lucide-react'
-import type { RadioStation } from '@/domain/models'
-import { formatKHz } from '@/domain/models'
-import { SignalWaveform } from '../signal-waveform/signal-waveform'
-import styles from './radio-station-card.module.scss'
+import { useState } from "react";
+
+import { Headphones } from "lucide-react";
+
+import type { RadioStation } from "@/domain/models";
+import { formatKHz } from "@/domain/models";
+
+import { SignalWaveform } from "../signal-waveform/signal-waveform";
+
+import styles from "./radio-station-card.module.scss";
 
 interface RadioStationCardProps {
-  station: RadioStation
+  station: RadioStation;
 }
 
-export function RadioStationCard({ station }: RadioStationCardProps) {
-  const [isListening, setIsListening] = useState(false)
+export const RadioStationCard = ({ station }: RadioStationCardProps) => {
+  const [isListening, setIsListening] = useState(false);
 
   const statusClass = {
     active: styles.statusActive,
     inactive: styles.statusInactive,
     intermittent: styles.statusIntermittent,
     unknown: styles.statusUnknown,
-  }[station.status]
+  }[station.status];
 
-  const lastSeenLabel = formatLastSeen(station.lastActivity)
-  const isActive = station.status === 'active' || station.status === 'intermittent'
+  const lastSeenLabel = formatLastSeen(station.lastActivity);
+  const isActive =
+    station.status === "active" || station.status === "intermittent";
 
   return (
     <div className={styles.card}>
@@ -55,12 +60,12 @@ export function RadioStationCard({ station }: RadioStationCardProps) {
 
       {station.webSdrUrl && (
         <button
-          className={`${styles.listenButton} ${isListening ? styles.listenButtonActive : ''}`}
+          className={`${styles.listenButton} ${isListening ? styles.listenButtonActive : ""}`}
           onClick={() => setIsListening(!isListening)}
           type="button"
         >
           <Headphones size={14} />
-          {isListening ? 'Close Listener' : 'Listen Live'}
+          {isListening ? "Close Listener" : "Listen Live"}
         </button>
       )}
 
@@ -81,17 +86,19 @@ export function RadioStationCard({ station }: RadioStationCardProps) {
         <span className={styles.lastSeen}>{lastSeenLabel}</span>
       </div>
     </div>
-  )
-}
+  );
+};
 
 function formatLastSeen(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime()
-  const hours = Math.floor(diff / 3600000)
+  const diff = Date.now() - new Date(iso).getTime();
+  const hours = Math.floor(diff / 3600000);
 
-  if (hours < 1) return 'Just now'
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  if (days < 30) return `${days}d ago`
-  const months = Math.floor(days / 30)
-  return `${months}mo ago`
+  if (hours < 1) return "Just now";
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+
+  if (days < 30) return `${days}d ago`;
+  const months = Math.floor(days / 30);
+
+  return `${months}mo ago`;
 }

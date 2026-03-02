@@ -1,46 +1,51 @@
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
-import type { ActivityIndicator } from '@/domain/models'
-import { formatDeviation, getConfidenceLabel } from '@/domain/models'
-import { InfoTooltip } from '@/components/ui/info-tooltip/info-tooltip'
-import { tooltipContent } from '@/lib/tooltip-content'
-import { IndicatorTrend } from '../indicator-trend/indicator-trend'
-import styles from './indicator-card.module.scss'
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+
+import { InfoTooltip } from "@/components/ui/info-tooltip/info-tooltip";
+import type { ActivityIndicator } from "@/domain/models";
+import { formatDeviation, getConfidenceLabel } from "@/domain/models";
+import { tooltipContent } from "@/lib/tooltip-content";
+
+import { IndicatorTrend } from "../indicator-trend/indicator-trend";
+
+import styles from "./indicator-card.module.scss";
 
 interface IndicatorCardProps {
-  indicator: ActivityIndicator
-  onClick?: () => void
+  indicator: ActivityIndicator;
+  onClick?: () => void;
 }
 
-export function IndicatorCard({ indicator, onClick }: IndicatorCardProps) {
+export const IndicatorCard = ({ indicator, onClick }: IndicatorCardProps) => {
   const deviationClass =
     indicator.deviation > 0
       ? styles.deviationPositive
       : indicator.deviation < 0
         ? styles.deviationNegative
-        : styles.deviationNeutral
+        : styles.deviationNeutral;
 
   const trendClass =
-    indicator.trend === 'increasing'
+    indicator.trend === "increasing"
       ? styles.trendIncreasing
-      : indicator.trend === 'decreasing'
+      : indicator.trend === "decreasing"
         ? styles.trendDecreasing
-        : styles.trendStable
+        : styles.trendStable;
 
   const confidenceClass =
     indicator.confidence >= 0.9
       ? styles.confidenceHigh
       : indicator.confidence >= 0.7
         ? styles.confidenceMedium
-        : styles.confidenceLow
+        : styles.confidenceLow;
 
   const TrendIcon =
-    indicator.trend === 'increasing'
+    indicator.trend === "increasing"
       ? TrendingUp
-      : indicator.trend === 'decreasing'
+      : indicator.trend === "decreasing"
         ? TrendingDown
-        : Minus
+        : Minus;
 
-  const regionLabel = indicator.region.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  const regionLabel = indicator.region
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
     <div className={styles.card} onClick={onClick} role="button" tabIndex={0}>
@@ -52,7 +57,9 @@ export function IndicatorCard({ indicator, onClick }: IndicatorCardProps) {
               <InfoTooltip content={tooltipContent[indicator.type]} />
             )}
           </h3>
-          <span className={styles.type}>{indicator.type.replace(/_/g, ' ')}</span>
+          <span className={styles.type}>
+            {indicator.type.replace(/_/g, " ")}
+          </span>
         </div>
         <span className={`${styles.trendBadge} ${trendClass}`}>
           <TrendIcon size={12} />
@@ -67,7 +74,9 @@ export function IndicatorCard({ indicator, onClick }: IndicatorCardProps) {
         </span>
       </div>
 
-      <div className={styles.baseline}>Baseline: {indicator.baseline.toFixed(1)}</div>
+      <div className={styles.baseline}>
+        Baseline: {indicator.baseline.toFixed(1)}
+      </div>
 
       {indicator.history && indicator.history.length > 0 && (
         <IndicatorTrend history={indicator.history} />
@@ -80,5 +89,5 @@ export function IndicatorCard({ indicator, onClick }: IndicatorCardProps) {
         </span>
       </div>
     </div>
-  )
-}
+  );
+};
