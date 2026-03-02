@@ -10,7 +10,13 @@ import tseslint from "typescript-eslint";
 export default [
   // Global ignores
   {
-    ignores: ["dist/**", ".output/**", "**/*.css", "**/*.scss"],
+    ignores: [
+      "dist/**",
+      ".output/**",
+      "**/*.css",
+      "**/*.scss",
+      "**/src/routes/**",
+    ],
   },
 
   // Base JavaScript configuration
