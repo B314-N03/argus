@@ -77,14 +77,13 @@ If the branch has no upstream, use `git push -u origin <branch-name>`.
 
 ## Failure Handling
 
-| Failure                      | Action                                        |
-| ---------------------------- | --------------------------------------------- |
-| On `main` or `master` branch | Abort, tell the user to use a feature branch  |
-| No changes at all            | Stop, tell the user there's nothing to commit |
-| Nothing staged               | Group unstaged changes and propose packages   |
-| `npm run validate` fails     | Stop, show errors, do not commit              |
-| Push fails (no upstream)     | Retry with `git push -u origin <branch>`      |
-| Push fails (other reason)    | Show the error, do not retry                  |
+| Failure                   | Action                                        |
+| ------------------------- | --------------------------------------------- |
+| No changes at all         | Stop, tell the user there's nothing to commit |
+| Nothing staged            | Group unstaged changes and propose packages   |
+| `npm run validate` fails  | Stop, show errors, do not commit              |
+| Push fails (no upstream)  | Retry with `git push -u origin <branch>`      |
+| Push fails (other reason) | Show the error, do not retry                  |
 
 ## Notes
 
