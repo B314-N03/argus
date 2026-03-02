@@ -10,11 +10,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "lint": "eslint",
-    "format": "prettier --check .",
-    "check": "prettier --write . && eslint --fix",
+    "lint": "eslint . --fix \"./**/*.{ts,tsx}\"",
+    "format": "prettier --write \"./**/*.{ts,tsx}\"",
+    "check": "tsc --noEmit -p tsconfig.app.json",
     "start": "node .output/server/index.mjs",
-    "typecheck": "tsc --noEmit"
+    "validate": "npm run check && npm run format && npm run lint "
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.8",
@@ -46,6 +46,12 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-validate-filename": "^1.2.0",
     "jsdom": "^27.0.0",
     "prettier": "^3.5.3",
     "sass": "^1.85.0",
