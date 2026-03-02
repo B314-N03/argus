@@ -229,6 +229,7 @@ Widgets in the right panel are individually togglable via a settings popover. Vi
 All mock data uses seeded random generation (`/lib/api/mock/seed.ts`) with the mulberry32 algorithm for deterministic, reproducible output.
 
 Key datasets:
+
 - 30 aircraft, 20 vessels, 25 signals (generated per-index with seed)
 - 42 indicators (6 types x 7 regions) with 24h hourly history
 - 8 active zones (NOTAM, blockade, duty_zone, exclusion)
@@ -262,6 +263,7 @@ Indicators must:
 # Tension Index
 
 Composite score (0-100) derived from indicator data:
+
 - `deviationComponent = min(|averageDeviation| * 1.5, 40)`
 - `elevatedComponent = min(elevatedCount * 3, 30)`
 - `anomalousComponent = min(anomalousCount * 5, 30)`
@@ -337,5 +339,6 @@ Claude must:
 - Use the Dialog component for modals (not custom implementations)
 - Use the settings system for user preferences that should persist
 - Follow kebab-case file naming convention for all new files
+- Run `npm run validate` in the end to verify it didnt produce any issues
 
 ---
