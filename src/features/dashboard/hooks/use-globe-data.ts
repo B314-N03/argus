@@ -11,7 +11,7 @@ import { mockZones } from "@/lib/api/mock/zones";
 import { useCountryGeoJSON } from "./use-country-geojson";
 
 export function useGlobeData() {
-  const { data: aircraftData } = useAircraft({ limit: 30 });
+  const { data: aircraftData } = useAircraft({ limit: 500 });
   const { data: radiosData } = useRadios();
   const { data: indicatorsData } = useIndicators({
     timeWindow: "24h" as TimeWindow,
@@ -31,6 +31,7 @@ export function useGlobeData() {
           lng: a.position.longitude,
           label: a.callsign ?? a.icao24,
           category: a.category,
+          heading: a.velocity?.heading,
           type: "aircraft" as const,
         })),
     [aircraftData],
@@ -76,5 +77,6 @@ export function useGlobeData() {
     radios: radiosData,
     vessels,
     signals,
+    aircraft: aircraftData?.aircraft ?? [],
   };
 }

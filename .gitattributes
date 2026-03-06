@@ -1,0 +1,15 @@
+# Normalize line endings to LF for all text files
+* text=auto
+
+# Ensure binary files are not treated as text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary

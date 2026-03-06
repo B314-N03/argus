@@ -1,0 +1,98 @@
+@use '@/styles/variables' as *;
+@use '@/styles/mixins' as *;
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.imageSection {
+  display: flex;
+  justify-content: center;
+}
+
+.imagePlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-2;
+  width: 100%;
+  max-width: 280px;
+  height: 160px;
+  background: rgba($color-muted, 0.3);
+  border-radius: $radius-lg;
+  color: $color-muted-foreground;
+}
+
+.imageLabel {
+  font-size: $font-size-xs;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.callsign {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-foreground;
+  text-align: center;
+  padding: $spacing-2;
+  background: rgba($color-primary, 0.1);
+  border-radius: $radius-md;
+  border: 1px solid rgba($color-primary, 0.2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-3;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fieldLabel {
+  font-size: 10px;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fieldValue {
+  font-size: $font-size-sm;
+  color: $color-foreground;
+  font-weight: $font-weight-medium;
+}
+
+.position {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-2 $spacing-3;
+  background: rgba($color-muted, 0.3);
+  border-radius: $radius-md;
+}
+
+.positionLabel {
+  font-size: $font-size-xs;
+  color: $color-muted-foreground;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.positionValue {
+  font-size: $font-size-sm;
+  color: $color-foreground;
+  font-family: $font-family-mono;
+  font-weight: $font-weight-medium;
+}

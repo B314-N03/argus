@@ -15,9 +15,9 @@ import {
   NewsDetailModal,
   useGlobeData,
 } from "@/features/dashboard";
+import { useNews } from "@/lib/api/hooks/use-news";
 import { findCountryByName } from "@/lib/api/mock/countries";
 import { generateTensionHistory } from "@/lib/api/mock/indicators";
-import { mockNewsItems } from "@/lib/api/mock/news";
 import {
   useSettings,
   SETTINGS_KEYS,
@@ -28,6 +28,7 @@ import type { FeedSplitState } from "@/lib/settings";
 import styles from "./index.module.scss";
 
 const DashboardPage = () => {
+  const { data: newsData } = useNews({ limit: 15 });
   const {
     aircraftPoints,
     vesselPoints,
@@ -37,6 +38,7 @@ const DashboardPage = () => {
     indicators,
     vessels,
     signals,
+    aircraft,
   } = useGlobeData();
 
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
@@ -195,7 +197,7 @@ const DashboardPage = () => {
               style={{ flex: topCollapsed ? "0 0 auto" : topFlex }}
             >
               <NewsFeed
-                items={mockNewsItems}
+                items={newsData?.items ?? []}
                 onItemClick={handleNewsItemClick}
                 collapsed={topCollapsed}
                 onToggleCollapse={toggleTopCollapse}
@@ -229,6 +231,7 @@ const DashboardPage = () => {
               signalPoints={signalPoints}
               zones={zones}
               countries={countries}
+              aircraftData={aircraft}
               onCountrySelect={handleCountrySelect}
             />
             <TensionIndex value={tensionValue} history={tensionHistory} />
@@ -247,7 +250,7 @@ const DashboardPage = () => {
       />
       <CountryModal
         country={selectedCountry}
-        newsItems={mockNewsItems}
+        newsItems={newsData?.items ?? []}
         onClose={() => setSelectedCountry(null)}
       />
       <NewsDetailModal

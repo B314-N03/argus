@@ -86,3 +86,41 @@ export interface GetRadiosResponse {
   stations: RadioStation[];
   summary: RadioSummary;
 }
+
+// Airplanes.live API response type
+export interface AirplanesLiveResponse {
+  ac: AirplanesLiveAircraft[];
+  total: number;
+  ctime: number;
+  now: number;
+  msg: string;
+}
+
+export interface AirplanesLiveAircraft {
+  hex: string;
+  flight?: string;
+  r?: string;
+  t?: string;
+  lat: number;
+  lon: number;
+  alt_baro?: number;
+  alt_geom?: number;
+  gs?: number;
+  track?: number;
+  true_heading?: number;
+  baro_rate?: number;
+  geom_rate?: number;
+  seen_pos?: number;
+  now: number;
+  category?: number;
+  dbFlags?: number;
+}
+
+// GDELT API response type
+export interface GdeltArticle {
+  url: string;
+  domain: string;
+  title: string;
+  seendate: string;
+  themes?: string;
+}

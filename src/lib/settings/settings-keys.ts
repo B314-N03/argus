@@ -1,6 +1,9 @@
+import type { AircraftCategory } from "@/domain/models";
+
 export const SETTINGS_KEYS = {
   VISIBLE_WIDGETS: "argus.widgets.visible",
   GLOBE_ENTITY_FILTERS: "argus.globe.entityFilters",
+  AIRCRAFT_CATEGORY_FILTERS: "argus.globe.aircraftCategoryFilters",
   GLOBE_SETTINGS: "argus.globe.settings",
   SIDEBAR_STATE: "argus.ui.sidebarState",
   FEED_SPLIT: "argus.ui.feedSplit",
@@ -32,11 +35,47 @@ export interface GlobeEntityFilters {
   signal: boolean;
 }
 
+export interface AircraftCategoryFilters {
+  military: boolean;
+  government: boolean;
+  commercial: boolean;
+  cargo: boolean;
+  private: boolean;
+}
+
+export const DEFAULT_AIRCRAFT_CATEGORY_FILTERS: AircraftCategoryFilters = {
+  military: true,
+  government: true,
+  commercial: false,
+  cargo: false,
+  private: false,
+};
+
 export const DEFAULT_GLOBE_ENTITY_FILTERS: GlobeEntityFilters = {
   aircraft: true,
   vessel: true,
   signal: true,
 };
+
+export function isAircraftCategoryIncluded(
+  category: AircraftCategory,
+  filters: AircraftCategoryFilters,
+): boolean {
+  switch (category) {
+    case "military":
+      return filters.military;
+    case "government":
+      return filters.government;
+    case "commercial":
+      return filters.commercial;
+    case "cargo":
+      return filters.cargo;
+    case "private":
+      return filters.private;
+    case "unknown":
+      return true;
+  }
+}
 
 export interface SidebarState {
   leftWidth: number;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import styles from "./dashboard-header.module.scss";
 
@@ -11,9 +11,17 @@ export const DashboardHeader = ({
   activeRegions,
   totalEntities,
 }: DashboardHeaderProps) => {
-  const [utcTime, setUtcTime] = useState(getUTC());
+  const [utcTime, setUtcTime] = useState("--:--:--");
+  const isMounted = useRef(false);
 
   useEffect(() => {
+    // Skip first render to avoid hydration mismatch
+    if (isMounted.current) {
+      setUtcTime(getUTC());
+    }
+
+    isMounted.current = true;
+
     const interval = setInterval(() => setUtcTime(getUTC()), 1000);
 
     return () => clearInterval(interval);

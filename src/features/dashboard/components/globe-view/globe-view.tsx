@@ -16,6 +16,7 @@ import type {
   AircraftCategory,
   ShipType,
   SignalType,
+  Aircraft,
 } from "@/domain/models";
 import {
   getAircraftCategoryLabel,
@@ -29,9 +30,16 @@ import {
   SETTINGS_KEYS,
   DEFAULT_GLOBE_ENTITY_FILTERS,
   DEFAULT_GLOBE_SETTINGS,
+  DEFAULT_AIRCRAFT_CATEGORY_FILTERS,
+  isAircraftCategoryIncluded,
 } from "@/lib/settings";
-import type { GlobeEntityFilters, GlobeSettings } from "@/lib/settings";
+import type {
+  GlobeEntityFilters,
+  GlobeSettings,
+  AircraftCategoryFilters,
+} from "@/lib/settings";
 
+import { AircraftModal } from "../aircraft-modal/aircraft-modal";
 import {
   TEXTURE_URLS,
   BACKGROUND_CONFIG,
@@ -53,6 +61,7 @@ export interface GlobePoint {
   category?: AircraftCategory;
   shipType?: ShipType;
   signalType?: SignalType;
+  heading?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,6 +92,7 @@ interface GlobeViewProps {
   signalPoints: GlobePoint[];
   zones: Zone[];
   countries?: GeoJSONFeature[];
+  aircraftData: Aircraft[];
   onCountrySelect?: (countryName: string) => void;
 }
 
@@ -127,8 +137,8 @@ const ZONE_TYPE_ABBR: Record<ZoneType, string> = {
   duty_zone: "P",
 };
 
-const ZONE_FILL_OPACITY = "1a"; // ~10% fill
-const ZONE_STROKE_OPACITY = "88"; // ~53% stroke
+const ZONE_FILL_OPACITY = "1a";
+const ZONE_STROKE_OPACITY = "88";
 
 const GLOBE_RADIUS = 100;
 const BADGE_ALTITUDE = 0.012;
@@ -153,7 +163,6 @@ function createZoneBadgeSprite(text: string, color: string): Sprite {
   canvas.height = size;
   const ctx = canvas.getContext("2d")!;
 
-  // Circle background
   ctx.beginPath();
   ctx.arc(size / 2, size / 2, size / 2 - 4, 0, Math.PI * 2);
   ctx.fillStyle = `${color}33`;
@@ -162,7 +171,6 @@ function createZoneBadgeSprite(text: string, color: string): Sprite {
   ctx.lineWidth = 4;
   ctx.stroke();
 
-  // Centered text
   ctx.fillStyle = color;
   ctx.font = "bold 52px sans-serif";
   ctx.textAlign = "center";
@@ -242,6 +250,7 @@ const GlobeRenderer = ({
   signalPoints,
   zones,
   countries,
+  aircraftData,
   onCountrySelect,
 }: GlobeViewProps) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -255,10 +264,20 @@ const GlobeRenderer = ({
     SETTINGS_KEYS.GLOBE_ENTITY_FILTERS,
     DEFAULT_GLOBE_ENTITY_FILTERS,
   );
+  const [categoryFilters, setCategoryFilters] = useSettings<AircraftCategoryFilters>(
+    SETTINGS_KEYS.AIRCRAFT_CATEGORY_FILTERS,
+    DEFAULT_AIRCRAFT_CATEGORY_FILTERS,
+  );
   const [globeSettings, setGlobeSettings] = useSettings<GlobeSettings>(
     SETTINGS_KEYS.GLOBE_SETTINGS,
     DEFAULT_GLOBE_SETTINGS,
   );
+  const [selectedAircraft, setSelectedAircraft] = useState<Aircraft | null>(null);
+  const [globeRotation, setGlobeRotation] = useState({ lng: 0, lat: 90 });
+
+  // Track if we just clicked on an aircraft to prevent country modal from also opening
+  const justClickedAircraftRef = useRef(false);
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const resolvedTexture = TEXTURE_URLS[globeSettings.texture];
   const resolvedBg = BACKGROUND_CONFIG[globeSettings.background];
@@ -285,13 +304,21 @@ const GlobeRenderer = ({
     return () => observer.disconnect();
   }, []);
 
+  const filteredAircraftPoints = useMemo(
+    () =>
+      aircraftPoints.filter((a) =>
+        isAircraftCategoryIncluded(a.category ?? "unknown", categoryFilters),
+      ),
+    [aircraftPoints, categoryFilters],
+  );
+
   const entityPoints = useMemo(
     () => [
-      ...(filters.aircraft ? aircraftPoints : []),
+      ...(filters.aircraft ? filteredAircraftPoints : []),
       ...(filters.vessel ? vesselPoints : []),
       ...(filters.signal ? signalPoints : []),
     ],
-    [aircraftPoints, vesselPoints, signalPoints, filters],
+    [filteredAircraftPoints, vesselPoints, signalPoints, filters],
   );
 
   const zoneBadgeData: ZoneBadgeData[] = useMemo(
@@ -350,6 +377,29 @@ const GlobeRenderer = ({
     }
   }, []);
 
+  const handleAircraftClick = useCallback(
+    (point: GlobePoint) => {
+      if (point.type !== "aircraft") return;
+
+      // Set flag to prevent polygon click from opening country modal
+      justClickedAircraftRef.current = true;
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+
+      clickTimeoutRef.current = setTimeout(() => {
+        justClickedAircraftRef.current = false;
+      }, 300);
+
+      const aircraft = aircraftData.find((a) => a.id === point.id);
+
+      if (aircraft) {
+        setSelectedAircraft(aircraft);
+      }
+    },
+    [aircraftData],
+  );
+
   const htmlElement = useCallback(
     (d: object) => {
       const point = d as GlobePoint;
@@ -360,10 +410,14 @@ const GlobeRenderer = ({
       el.style.pointerEvents = "auto";
       el.addEventListener("mouseenter", () => showEntityTooltip(el, point));
       el.addEventListener("mouseleave", hideEntityTooltip);
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        handleAircraftClick(point);
+      });
 
       return el;
     },
-    [showEntityTooltip, hideEntityTooltip],
+    [showEntityTooltip, hideEntityTooltip, handleAircraftClick],
   );
 
   // Zone badges as WebGL sprites via custom layer
@@ -453,17 +507,23 @@ const GlobeRenderer = ({
     setHoverCountry(d);
   }, []);
 
-  const handlePolygonClick = useCallback(
-    (d: object | null) => {
-      if (!d || !onCountrySelect || isZonePolygon(d)) return;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const feat = d as any;
-      const name = feat?.properties?.name;
+  const handleMoveEnd = useCallback((coords: { lat: number; lng: number; altitude: number }) => {
+    setGlobeRotation({ lng: coords.lng, lat: coords.lat });
+  }, []); const handlePolygonClick = useCallback((d: object | null) => {
+    // Don't open country modal if we just clicked on an aircraft
+    if (justClickedAircraftRef.current) {
+      return;
+    }
 
-      if (name) {
-        onCountrySelect(name);
-      }
-    },
+    if (!d || !onCountrySelect || isZonePolygon(d)) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const feat = d as any;
+    const name = feat?.properties?.name;
+
+    if (name) {
+      onCountrySelect(name);
+    }
+  },
     [onCountrySelect],
   );
 
@@ -474,7 +534,12 @@ const GlobeRenderer = ({
       style={resolvedBg.url ? undefined : { backgroundColor: resolvedBg.color }}
     >
       <div ref={tooltipRef} className={styles.entityTooltip} />
-      <GlobeEntityFilter filters={filters} onChange={setFilters} />
+      <GlobeEntityFilter
+        filters={filters}
+        categoryFilters={categoryFilters}
+        onChange={setFilters}
+        onCategoryChange={setCategoryFilters}
+      />
       <GlobeSettingsTrigger
         settings={globeSettings}
         onChange={setGlobeSettings}
@@ -508,8 +573,13 @@ const GlobeRenderer = ({
           polygonLabel={polygonLabel}
           onPolygonHover={handlePolygonHover}
           onPolygonClick={handlePolygonClick}
+          enablePointerInteraction
         />
       )}
+      <AircraftModal
+        aircraft={selectedAircraft}
+        onClose={() => setSelectedAircraft(null)}
+      />
     </div>
   );
 };

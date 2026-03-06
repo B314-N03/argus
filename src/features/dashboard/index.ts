@@ -6,6 +6,7 @@ export { DashboardHeader } from "./components/dashboard-header/dashboard-header"
 export { WidgetStack } from "./components/widget-stack/widget-stack";
 export { CountryModal } from "./components/country-modal/country-modal";
 export { NewsDetailModal } from "./components/news-detail-modal/news-detail-modal";
+export { AircraftModal } from "./components/aircraft-modal/aircraft-modal";
 export { ChokepointWidget } from "./components/chokepoint-widget/chokepoint-widget";
 export { ForceSummary } from "./components/force-summary/force-summary";
 export { useGlobeData } from "./hooks/use-globe-data";

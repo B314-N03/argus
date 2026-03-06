@@ -5,10 +5,13 @@ interface EntityPoint {
   category?: AircraftCategory;
   shipType?: ShipType;
   signalType?: SignalType;
+  heading?: number;
 }
 
-function jetIcon(color: string, filled: boolean): string {
-  return `<svg width="16" height="16" viewBox="0 0 24 24" fill="${filled ? color : "none"}" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>`;
+function jetIcon(color: string, filled: boolean, rotation: number = 0): string {
+  // Rotation is in degrees, SVG transform rotates around center
+  const transform = rotation !== 0 ? ` transform="rotate(${rotation} 12 12)"` : "";
+  return `<svg width="16" height="16" viewBox="0 0 24 24" fill="${filled ? color : "none"}" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"${transform}><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>`;
 }
 
 function shipIcon(color: string, filled: boolean): string {
@@ -21,15 +24,22 @@ function radioWaveIcon(color: string): string {
 
 export function getEntityIconSvg(point: EntityPoint): string {
   if (point.type === "aircraft") {
+    // Convert heading (0-360, 0=North, 90=East) to SVG rotation
+    // The aircraft icon points up by default, so we need to rotate it
+    // Heading 0 = pointing North (up) = 0 rotation
+    // Heading 90 = pointing East = 90 rotation
+    // But the icon points to the right by default in its path, so we offset by -90
+    const rotation = point.heading !== undefined ? point.heading - 90 : 0;
+
     switch (point.category) {
       case "military":
-        return jetIcon("#1d9bf0", true);
+        return jetIcon("#1d9bf0", true, rotation);
       case "government":
-        return jetIcon("#8947c5", true);
+        return jetIcon("#8947c5", true, rotation);
       case "cargo":
-        return jetIcon("#f4900c", false);
+        return jetIcon("#f4900c", false, rotation);
       default:
-        return jetIcon("#71767b", false);
+        return jetIcon("#71767b", false, rotation);
     }
   }
 
